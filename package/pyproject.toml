@@ -1,0 +1,182 @@
+[project]
+name = "<bootstrap-name>"
+description = "<bootstrap-description>"
+readme = "README.md"
+requires-python = ">=3.<bootstrap-python-minor>"
+license = {file = "LICENSE"}
+authors = [{name = "<bootstrap-author>", email = "<bootstrap-author-email>"}]
+keywords = ["framework", "asyncio", "<bootstrap-name>"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Environment :: Other Environment",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.<bootstrap-python-minor>",
+    "Topic :: Internet",
+]
+dynamic = ["version", "dependencies"]
+
+[project.urls]
+repository = "<bootstrap-repo-git>"
+changelog = "<bootstrap-repo-http>/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = [
+    "setuptools",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "<bootstrap-dir>.VERSION"}
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+include = ["<bootstrap-dir>*"]
+
+[tool.setuptools.package-data]
+"*" = [
+    "make.bat",
+    "Makefile",
+]
+
+[tool.black]
+target-version = ['py3<bootstrap-python-minor>']
+line-length = 80
+
+[tool.isort]
+profile = "black"
+py_version=3<bootstrap-python-minor>
+skip = [
+    ".git",
+    ".tox",
+    ".venv",
+]
+
+[tool.flake8]
+exclude = [
+    ".git",
+    ".tox",
+    ".venv",
+]
+max-line-length = 88
+extend-ignore = [
+    "E203",
+    "E701",
+]
+import-order-style = "pep8"
+application-import-names = ["<bootstrap-dir>"]
+
+[tool.mypy]
+check_untyped_defs = true
+exclude = "/(.venv)"
+files = "**/*.py"
+follow_imports = "silent"
+ignore_missing_imports = true
+python_version = "3.<bootstrap-python-minor>"
+show_error_codes = true
+show_error_context = true
+
+[[tool.mypy.overrides]]
+module = "<bootstrap-dir>.tests.*"
+disable_error_code = [
+    "arg-type",
+    "assignment",
+    "attr-defined",
+    "method-assign",
+]
+
+[tool.coverage.run]
+omit = ["<bootstrap-dir>/tests/*"]
+source = ["<bootstrap-dir>"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if t.TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+omit = ["<bootstrap-dir>/tests/*"]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = cs,ann,utc
+
+[testenv:format]
+description = Formats code by black and isort tools
+deps =
+    black
+    isort
+commands =
+    isort <bootstrap-dir>
+    black <bootstrap-dir>
+
+[testenv:cs]
+description = Checks code style by black, isort and flake8 tools
+deps =
+    black
+    isort
+    flake8
+    flake8-pyproject
+commands =
+    isort --check-only --diff <bootstrap-dir>
+    black --check --diff <bootstrap-dir>
+    flake8 <bootstrap-dir>
+
+[testenv:ann]
+description = Checks types annotations by mypy
+deps =
+    mypy
+commands =
+    mypy <bootstrap-dir>
+
+[testenv:utc]
+description = Runs tests under coverage, prints a text report and builds HTML report
+deps =
+    --requirement requirements.txt
+    coverage
+commands =
+    coverage run --module unittest discover --verbose <bootstrap-dir>/tests
+    coverage report
+    coverage html
+
+[testenv:doc]
+description = Generates documentation using sphinx tool
+deps=
+    -r {toxinidir}/requirements.txt
+    sphinx
+commands=
+    sphinx-apidoc --separate --no-toc --no-headings --module-first --output-dir=docs/modules --ext-viewcode <bootstrap-dir>
+    sphinx-build -b html docs docs/build -v
+
+[testenv:build]
+description = Builds PIP package using build tool
+deps=
+    build
+commands=
+    python -m build --sdist
+
+
+[testenv:upload]
+description = Uploads generated PIP package to PyPI index
+deps=
+    twine
+passenv =
+    PYPI_REPOSITORY_ALIAS
+    PYPI_REPOSITORY_USERNAME
+    PYPI_REPOSITORY_PASSWORD
+setenv =
+    PYPI_REPOSITORY_ALIAS = {env:PYPI_REPOSITORY_ALIAS:testpypi}
+    PYPI_REPOSITORY_USERNAME = {env:PYPI_REPOSITORY_USERNAME:__token__}
+commands=
+    twine upload --repository={env:PYPI_REPOSITORY_ALIAS} --username={env:PYPI_REPOSITORY_USERNAME} --password={env:PYPI_REPOSITORY_PASSWORD} {posargs}
+"""
