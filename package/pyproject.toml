@@ -5,7 +5,7 @@ readme = "README.md"
 requires-python = ">=3.<bootstrap-python-minor>"
 license = {file = "LICENSE"}
 authors = [{name = "<bootstrap-author>", email = "<bootstrap-author-email>"}]
-keywords = ["framework", "asyncio", "<bootstrap-name>"]
+keywords = ["asyncio", "<bootstrap-name>"]
 classifiers = [
     "Development Status :: 1 - Planning",
     "Environment :: Other Environment",
@@ -55,23 +55,12 @@ line-length = 80
 [tool.isort]
 profile = "black"
 py_version=3<bootstrap-python-minor>
-skip = [
-    ".git",
-    ".tox",
-    ".venv",
-]
+skip = [".git", ".tox", ".venv"]
 
 [tool.flake8]
-exclude = [
-    ".git",
-    ".tox",
-    ".venv",
-]
+exclude = [".git", ".tox", ".venv"]
 max-line-length = 88
-extend-ignore = [
-    "E203",
-    "E701",
-]
+extend-ignore = ["E203", "E701"]
 import-order-style = "pep8"
 application-import-names = ["<bootstrap-dir>"]
 
@@ -104,82 +93,73 @@ exclude_lines = [
     "if t.TYPE_CHECKING:",
     "if __name__ == .__main__.:",
 ]
+fail_under = 95
 omit = ["<bootstrap-dir>/tests/*"]
 
 [tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = cs,ann,utc
+envlist = ["cs", "ann", "utc"]
 
-[testenv:format]
-description = Formats code by black and isort tools
-deps =
-    black
-    isort
-commands =
-    isort <bootstrap-dir>
-    black <bootstrap-dir>
+[tool.tox.env.format]
+description = "Formats code by black and isort tools"
+deps = ["black", "isort"]
+commands = [
+    ["isort", "<bootstrap-dir>"],
+    ["black", "<bootstrap-dir>"],
+]
 
-[testenv:cs]
-description = Checks code style by black, isort and flake8 tools
-deps =
-    black
-    isort
-    flake8
-    flake8-pyproject
-commands =
-    isort --check-only --diff <bootstrap-dir>
-    black --check --diff <bootstrap-dir>
-    flake8 <bootstrap-dir>
+[tool.tox.env.cs]
+description = "Checks code style by black, isort and flake8 tools"
+deps = ["black", "isort", "flake8", "flake8-pyproject"]
+commands = [
+    ["isort", "--check-only", "--diff", "<bootstrap-dir>"],
+    ["black", "--check", "--diff", "<bootstrap-dir>"],
+    ["flake8", "<bootstrap-dir>"],
+]
 
-[testenv:ann]
-description = Checks types annotations by mypy
-deps =
-    mypy
-commands =
-    mypy <bootstrap-dir>
+[tool.tox.env.ann]
+description = "Checks types annotations by mypy"
+deps = ["mypy"]
+commands = [
+    ["mypy", "<bootstrap-dir>"],
+]
 
-[testenv:utc]
-description = Runs tests under coverage, prints a text report and builds HTML report
-deps =
-    --requirement requirements.txt
-    coverage
-commands =
-    coverage run --module unittest discover --verbose <bootstrap-dir>/tests
-    coverage report
-    coverage html
+[tool.tox.env.utc]
+description = "Runs tests under coverage, prints a text report and builds HTML report"
+deps = ["--requirement={toxinidir}/requirements.txt", "coverage"]
+commands = [
+    ["coverage", "run", "--module", "unittest", "discover", "<bootstrap-dir>/tests"],
+    ["coverage", "report"],
+    ["coverage", "html"],
+]
 
-[testenv:doc]
-description = Generates documentation using sphinx tool
-deps=
-    -r {toxinidir}/requirements.txt
-    sphinx
-allowlist_externals=
-    rm
-commands=
-    rm -rf docs/modules
-    sphinx-apidoc --separate --no-toc --no-headings --module-first --output-dir=docs/modules --ext-viewcode <bootstrap-dir>
-    sphinx-build -b html docs docs/build -v
+[tool.tox.env.doc]
+description = "Generates documentation using sphinx tool"
+deps = ["--requirement={toxinidir}/requirements.txt", "sphinx"]
+allowlist_externals = ["rm"]
+commands = [
+    ["rm", "-rf", "docs/modules"],
+    ["sphinx-apidoc", "--separate", "--no-toc", "--no-headings", "--module-first", "--output-dir=docs/modules", "--ext-viewcode", "<bootstrap-dir>"],
+    ["sphinx-build", "-b", "html", "docs", "docs/build", "-v"],
+]
 
-[testenv:build]
-description = Builds PIP package using build tool
-deps=
-    build
-commands=
-    python -m build --sdist
+[tool.tox.env.build]
+description = "Builds PIP package using build tool"
+deps = ["build"]
+commands = [
+    ["python", "-m", "build", "--sdist"],
+]
 
 
-[testenv:upload]
-description = Uploads generated PIP package to PyPI index
-deps=
-    twine
-passenv =
-    PYPI_REPOSITORY_ALIAS
-    PYPI_REPOSITORY_USERNAME
-    PYPI_REPOSITORY_PASSWORD
-setenv =
-    PYPI_REPOSITORY_ALIAS = {env:PYPI_REPOSITORY_ALIAS:testpypi}
-    PYPI_REPOSITORY_USERNAME = {env:PYPI_REPOSITORY_USERNAME:__token__}
-commands=
-    twine upload --repository={env:PYPI_REPOSITORY_ALIAS} --username={env:PYPI_REPOSITORY_USERNAME} --password={env:PYPI_REPOSITORY_PASSWORD} {posargs}
-"""
+[tool.tox.env.upload]
+description = "Uploads generated PIP package to PyPI index"
+deps = ["twine"]
+passenv = [
+    "PYPI_REPOSITORY_ALIAS",
+    "PYPI_REPOSITORY_USERNAME",
+    "PYPI_REPOSITORY_PASSWORD",
+]
+set_env.PYPI_REPOSITORY_ALIAS = { replace = "env", name = "PYPI_REPOSITORY_ALIAS", default = "testpypi"}
+set_env.PYPI_REPOSITORY_USERNAME = { replace = "env", name = "PYPI_REPOSITORY_USERNAME", default = "__token__"}
+commands = [
+    ["twine", "upload", "--repository={env:PYPI_REPOSITORY_ALIAS}", "--username={env:PYPI_REPOSITORY_USERNAME}", "--password={env:PYPI_REPOSITORY_PASSWORD}", "--verbose", "{posargs}"],
+]

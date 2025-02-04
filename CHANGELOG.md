@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] - 2025-01-11
 
 ### Changed
+- Refactor `tox` section. Avoid from legacy format.
 - Modify `doc` pipeline for `tox` tool. See `pyproject.toml` file for details.
 
 ## [0.2.0] - 2024-0609
