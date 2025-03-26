@@ -3,7 +3,8 @@ name = "<bootstrap-name>"
 description = "<bootstrap-description>"
 readme = "README.md"
 requires-python = ">=3.<bootstrap-python-minor>"
-license = {file = "LICENSE"}
+license = "Apache-2.0"
+license-files = ["LICEN[CS]E*", "AUTHORS.md"]
 authors = [{name = "<bootstrap-author>", email = "<bootstrap-author-email>"}]
 keywords = ["asyncio", "<bootstrap-name>"]
 classifiers = [
@@ -11,7 +12,6 @@ classifiers = [
     "Environment :: Other Environment",
     "Framework :: AsyncIO",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Operating System :: POSIX",
     "Operating System :: POSIX :: Linux",
