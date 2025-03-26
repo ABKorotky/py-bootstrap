@@ -102,6 +102,7 @@ envlist = ["cs", "ann", "utc"]
 [tool.tox.env.format]
 description = "Formats code by black and isort tools"
 deps = ["black", "isort"]
+skip_install = true
 commands = [
     ["isort", "<bootstrap-dir>"],
     ["black", "<bootstrap-dir>"],
@@ -110,6 +111,7 @@ commands = [
 [tool.tox.env.cs]
 description = "Checks code style by black, isort and flake8 tools"
 deps = ["black", "isort", "flake8", "flake8-pyproject"]
+skip_install = true
 commands = [
     ["isort", "--check-only", "--diff", "<bootstrap-dir>"],
     ["black", "--check", "--diff", "<bootstrap-dir>"],
@@ -119,6 +121,7 @@ commands = [
 [tool.tox.env.ann]
 description = "Checks types annotations by mypy"
 deps = ["mypy"]
+skip_install = true
 commands = [
     ["mypy", "<bootstrap-dir>"],
 ]
@@ -145,6 +148,7 @@ commands = [
 [tool.tox.env.build]
 description = "Builds PIP package using build tool"
 deps = ["build"]
+skip_install = true
 commands = [
     ["python", "-m", "build", "--sdist"],
 ]
@@ -153,6 +157,7 @@ commands = [
 [tool.tox.env.upload]
 description = "Uploads generated PIP package to PyPI index"
 deps = ["twine"]
+skip_install = true
 passenv = [
     "PYPI_REPOSITORY_ALIAS",
     "PYPI_REPOSITORY_USERNAME",
