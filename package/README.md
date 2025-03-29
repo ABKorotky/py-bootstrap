@@ -7,7 +7,7 @@
 ### Installation
 
 ```bash
-python3.<bootstrap-pytho-minor> -m venv .venv
+python3.<bootstrap-python-minor> -m venv .venv
 source .venv/bin/activate
 ```
 
