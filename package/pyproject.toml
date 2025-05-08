@@ -22,8 +22,8 @@ classifiers = [
 dynamic = ["version", "dependencies"]
 
 [project.urls]
-repository = "<bootstrap-repo-git>"
-changelog = "<bootstrap-repo-http>/blob/main/CHANGELOG.md"
+repository = "<bootstrap-repo>.git"
+changelog = "<bootstrap-repo>/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = [
@@ -149,8 +149,10 @@ commands = [
 description = "Builds PIP package using build tool"
 deps = ["build"]
 skip_install = true
+allowlist_externals = ["rm"]
 commands = [
     ["python", "-m", "build", "--sdist"],
+    ["rm", "-rf", "build"],
 ]
 
 
@@ -160,11 +162,8 @@ deps = ["twine"]
 skip_install = true
 passenv = [
     "PYPI_REPOSITORY_ALIAS",
-    "PYPI_REPOSITORY_USERNAME",
-    "PYPI_REPOSITORY_PASSWORD",
 ]
 set_env.PYPI_REPOSITORY_ALIAS = { replace = "env", name = "PYPI_REPOSITORY_ALIAS", default = "testpypi"}
-set_env.PYPI_REPOSITORY_USERNAME = { replace = "env", name = "PYPI_REPOSITORY_USERNAME", default = "__token__"}
 commands = [
-    ["twine", "upload", "--repository={env:PYPI_REPOSITORY_ALIAS}", "--username={env:PYPI_REPOSITORY_USERNAME}", "--password={env:PYPI_REPOSITORY_PASSWORD}", "--verbose", "{posargs}"],
+    ["twine", "upload", "--repository={env:PYPI_REPOSITORY_ALIAS}", "--verbose", "{posargs}"],
 ]

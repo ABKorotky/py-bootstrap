@@ -17,8 +17,8 @@ source .venv/bin/activate
 
 Execute the following commands:
 ```bash
-git clone <bootstrap-repo-git>
-cd <bootstrap-dir>
+git clone <bootstrap-repo>
+cd <bootstrap-name>
 ```
 
 ### Prepare a virtual environment
