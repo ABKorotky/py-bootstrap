@@ -7,6 +7,7 @@ from py_bootstrap.base.operations import BaseOperationsDispatcher
 
 from .build_bootstrap import BuildBootstrapOperation
 from .list_bootstraps import ListBootstrapsOperation
+from .register_bootstrap import RegisterBootstrapOperation
 
 if t.TYPE_CHECKING:
     ...
@@ -21,4 +22,5 @@ class BootstrapsDispatcher(BaseOperationsDispatcher):
     operations_classes_map = {
         "list": ListBootstrapsOperation,
         "build": BuildBootstrapOperation,
+        "register": RegisterBootstrapOperation,
     }

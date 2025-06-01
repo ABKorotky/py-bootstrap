@@ -1,20 +1,20 @@
-DESCRIPTION = "Provides bootstrapping for Python packages based on tox tool."
+DESCRIPTION = "Generates a skeleton of Python package based on tox tool."
 
-CONTEXT = {
-    "name": None,
-    "dir_name": None,
-    "title": None,
-    "description": None,
-    "repo": None,
+CONTEXT: dict[str, str] = {
+    "name": "",
+    "dir_name": "",
+    "title": "",
+    "description": "",
+    "repo": "",
     "python_major": "3",
     "python_minor": "13",
-    "author": None,
-    "author_email": None,
-    "year": None,
-    "first_version_date": None,
+    "author": "",
+    "author_email": "",
+    "year": "",
+    "first_version_date": "",
 }
 
-CONTEXT_REQUIRED_KEYS = [
+CONTEXT_REQUIRED_KEYS: list[str] = [
     "name",
     "description",
     "author",
@@ -33,10 +33,10 @@ def prepare_context(context: dict[str, str]):
     import re
     from datetime import datetime
 
+    context["empty"] = ""
+
     name = context["name"]
     name_parts: list[str] = re.split("[-_ ]", name.strip())
-
-    context["empty"] = ""
 
     if not context.get("dir_name"):
         val = "_".join(name_parts)

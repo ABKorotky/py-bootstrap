@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class BuildBootstrapOperation(BaseBootstrapOperation):
-    cli_description = "Generates a skeleton from given bootstrap."
+    cli_description = "Generates a skeleton of project from given bootstrap."
+
     excluded_directories: list[str] = ["__pycache__"]
     excluded_file_extensions: list[str] = []
 

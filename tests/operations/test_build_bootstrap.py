@@ -136,6 +136,69 @@ class BuildRealBootstrapOperationTestCase(TestCase):
             os.path.join(os.getcwd(), "test-destination"), ignore_errors=True
         )
 
+    def test_build_application(self):
+        namespace = Namespace(
+            name="application",
+            destination_dir="test-destination",
+            context_overrides=[
+                "name:test-app",
+                "description:Test application description",
+            ],
+        )
+        self.tst_obj.set_cli_namespace(namespace=namespace)
+
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            self.tst_obj.run()
+
+        output = mock_stdout.getvalue()
+        assert not output
+
+        destination_path = self.tst_obj.destination_path
+        assert os.path.exists(destination_path)
+
+        assert os.path.isfile(os.path.join(destination_path, ".gitignore"))
+        assert os.path.isfile(
+            os.path.join(destination_path, ".pre-commit-config.yaml")
+        )
+        assert os.path.isfile(os.path.join(destination_path, "CHANGELOG.md"))
+        assert os.path.isfile(os.path.join(destination_path, "pyproject.toml"))
+        assert os.path.isfile(os.path.join(destination_path, "README.md"))
+        assert os.path.isfile(
+            os.path.join(destination_path, "requirements.txt")
+        )
+        assert os.path.isfile(
+            os.path.join(destination_path, "requirements-dev.txt")
+        )
+
+        assert os.path.isdir(os.path.join(destination_path, "docs"))
+        assert os.path.isfile(
+            os.path.join(destination_path, "docs", "__init__.py")
+        )
+        assert os.path.isfile(os.path.join(destination_path, "docs", "conf.py"))
+        assert os.path.isfile(
+            os.path.join(destination_path, "docs", "index.rst")
+        )
+        assert os.path.isfile(
+            os.path.join(destination_path, "docs", "make.bat")
+        )
+        assert os.path.isfile(
+            os.path.join(destination_path, "docs", "Makefile")
+        )
+
+        assert os.path.isdir(os.path.join(destination_path, "test_app"))
+        assert os.path.isfile(
+            os.path.join(destination_path, "test_app", "__init__.py")
+        )
+
+        assert os.path.isdir(os.path.join(destination_path, "tests"))
+        assert os.path.isfile(
+            os.path.join(destination_path, "tests", "__init__.py")
+        )
+        assert os.path.isfile(
+            os.path.join(destination_path, "tests", "test_app.py")
+        )
+
     def test_build_package(self):
         namespace = Namespace(
             name="package",
@@ -201,3 +264,23 @@ class BuildRealBootstrapOperationTestCase(TestCase):
         assert os.path.isfile(
             os.path.join(destination_path, "tests", "test_package.py")
         )
+
+    def test_build_template(self):
+        namespace = Namespace(
+            name="template",
+            destination_dir="test-destination",
+            context_overrides=[],
+        )
+        self.tst_obj.set_cli_namespace(namespace=namespace)
+
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            self.tst_obj.run()
+
+        output = mock_stdout.getvalue()
+        assert not output
+
+        destination_path = self.tst_obj.destination_path
+        assert os.path.exists(destination_path)
+
+        assert os.path.isfile(os.path.join(destination_path, "__metadata__.py"))

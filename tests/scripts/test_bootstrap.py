@@ -27,14 +27,14 @@ class MainTestCase(TestCase):
         options:
           -h, --help  show this help message and exit
         Registered operations:
-          {list.build}
+          {list,build,register}
           Prints the list of available bootstraps.
           Generates a skeleton from given bootstrap.
         """
         assert "usage: bootstrap [-h]" in output
         assert "Bootstrapping Python projects management tool" in output
         assert "-h, --help" in output
-        assert "{list,build}" in output
+        assert "{list,build,register}" in output
 
     def test_list_bootstraps(self):
         mock_stdout = io.StringIO()
@@ -43,11 +43,9 @@ class MainTestCase(TestCase):
 
         output = mock_stdout.getvalue()
 
+        assert "application" in output
         assert "package" in output
-        assert (
-            "Provides bootstrapping for Python packages based on tox tool"
-            in output
-        )
+        assert "template" in output
 
     def test_build_bootstrap(self):
         try:
@@ -69,3 +67,18 @@ class MainTestCase(TestCase):
             assert not output
         finally:
             shutil.rmtree(os.path.join(os.getcwd(), "test-destination"))
+
+    def test_register_bootstrap(self):
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            main(
+                cli_args=[
+                    "register",
+                    "--name=test-bootstrap",
+                    "--source=test-source",
+                    "--override",
+                ]
+            )
+
+        output = mock_stdout.getvalue()
+        assert not output

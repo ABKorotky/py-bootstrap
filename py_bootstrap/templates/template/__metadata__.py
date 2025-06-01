@@ -1,0 +1,16 @@
+DESCRIPTION = "Generates a skeleton for new bootstrap template (metadata)."
+
+CONTEXT: dict[str, str] = {}
+
+CONTEXT_REQUIRED_KEYS: list[str] = []
+
+
+def validate_context(context: dict[str, str]) -> bool:
+    for key in CONTEXT_REQUIRED_KEYS:
+        if not context.get(key):
+            raise ValueError(f"Missing required context key: {key}")
+    return True
+
+
+def prepare_context(context: dict[str, str]):
+    context["empty"] = ""

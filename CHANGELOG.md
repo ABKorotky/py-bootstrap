@@ -7,13 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### [0.4.0] - 2025-06-02
+### Added
+- Implement `RegisterBootstrapOperation` class for registering new customer's bootstraps. See `/py_bootstrap/operations/register_bootstrap.py` file for details.
+- Prepare `template` bootstrap structure. See `/py_bootstrap/templates/template/` directory for details.
+
 ## [0.3.0] - 2025-06-01
 ### Added
-_ Prepare `application` bootstrap structure. See `/py_bootstrap/templates/application/` directory for details.
+- Prepare `application` bootstrap structure. See `/py_bootstrap/templates/application/` directory for details.
 
 ## [0.2.0] - 2025-06-01
 ### Added
-_ Prepare `package` bootstrap structure. See `/py_bootstrap/templates/package/` directory for details.
+- Prepare `package` bootstrap structure. See `/py_bootstrap/templates/package/` directory for details.
 - Implement `BuildBootstrapOperation` class for generating a given bootstrap. See `/py_bootstrap/operations/build_bootstraps.py` file for details.
 - Implement `ListBootstrapsOperation` class for printing enabled bootstraps. See `/py_bootstrap/operations/list_bootstraps.py` file for details.
 - Implement the main script for running bootstrap operations. See `/py_bootstrap/scripts/bootstrap.py` file for details.
