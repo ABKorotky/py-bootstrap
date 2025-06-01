@@ -9,17 +9,16 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
-import typing as t
 
 sys.path.insert(0, os.path.abspath(".."))
 
-import <bootstrap-dir> as package  # noqa
+import py_bootstrap as package  # noqa
 
 # -- Project information -----------------------------------------------------
 
 project = package.TITLE
 author = package.AUTHOR
-copyright = f"<bootstrap-year>, {author}"
+copyright = f"2025, {author}"
 
 # The full version, including alpha/beta/rc tags
 release = ".".join([str(i) for i in package.VERSION])
@@ -38,7 +37,7 @@ extensions: list[str] = [
 # Add any paths that contain templates here, relative to this directory.
 templates_path: list[str] = ["_templates"]
 
-# List of patterns, relative to source directory, that match files and
+# List of patterns, relative to a source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns: list[str] = ["build", "Thumbs.db", ".DS_Store"]

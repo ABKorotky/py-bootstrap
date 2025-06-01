@@ -1,12 +1,12 @@
 [project]
-name = "<bootstrap-name>"
-description = "<bootstrap-description>"
+name = "{name}"
+description = "{description}"
 readme = "README.md"
-requires-python = ">=3.<bootstrap-python-minor>"
+requires-python = ">={python_major}.{python_minor}"
 license = "Apache-2.0"
 license-files = ["LICEN[CS]E*", "AUTHORS.md"]
-authors = [{name = "<bootstrap-author>", email = "<bootstrap-author-email>"}]
-keywords = ["asyncio", "<bootstrap-name>"]
+authors = [{{name = "{author}", email = "{author_email}"}}]
+keywords = ["asyncio", "{name}"]
 classifiers = [
     "Development Status :: 1 - Planning",
     "Environment :: Other Environment",
@@ -16,14 +16,14 @@ classifiers = [
     "Operating System :: POSIX",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.<bootstrap-python-minor>",
+    "Programming Language :: Python :: {python_major}.{python_minor}",
     "Topic :: Internet",
 ]
 dynamic = ["version", "dependencies"]
 
 [project.urls]
-repository = "<bootstrap-repo>.git"
-changelog = "<bootstrap-repo>/blob/main/CHANGELOG.md"
+repository = "{repo}.git"
+changelog = "{repo}/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = [
@@ -36,11 +36,11 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.dynamic]
-version = {attr = "<bootstrap-dir>.VERSION"}
-dependencies = {file = ["requirements.txt"]}
+version = {{attr = "{dir_name}.VERSION"}}
+dependencies = {{file = ["requirements.txt"]}}
 
 [tool.setuptools.packages.find]
-include = ["<bootstrap-dir>*"]
+include = ["{dir_name}*"]
 
 [tool.setuptools.package-data]
 "*" = [
@@ -49,12 +49,12 @@ include = ["<bootstrap-dir>*"]
 ]
 
 [tool.black]
-target-version = ['py3<bootstrap-python-minor>']
+target-version = ['py{python_major}{python_minor}']
 line-length = 80
 
 [tool.isort]
 profile = "black"
-py_version=3<bootstrap-python-minor>
+py_version={python_major}{python_minor}
 skip = [".git", ".tox", ".venv"]
 
 [tool.flake8]
@@ -62,7 +62,7 @@ exclude = [".git", ".tox", ".venv"]
 max-line-length = 88
 extend-ignore = ["E203", "E701"]
 import-order-style = "pep8"
-application-import-names = ["<bootstrap-dir>"]
+application-import-names = ["{dir_name}"]
 
 [tool.mypy]
 check_untyped_defs = true
@@ -70,12 +70,12 @@ exclude = "/(.venv)"
 files = "**/*.py"
 follow_imports = "silent"
 ignore_missing_imports = true
-python_version = "3.<bootstrap-python-minor>"
+python_version = "{python_major}.{python_minor}"
 show_error_codes = true
 show_error_context = true
 
 [[tool.mypy.overrides]]
-module = "<bootstrap-dir>.tests.*"
+module = "tests.*"
 disable_error_code = [
     "arg-type",
     "assignment",
@@ -84,8 +84,8 @@ disable_error_code = [
 ]
 
 [tool.coverage.run]
-omit = ["<bootstrap-dir>/tests/*"]
-source = ["<bootstrap-dir>"]
+omit = ["tests/*"]
+source = ["{dir_name}"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -94,7 +94,7 @@ exclude_lines = [
     "if __name__ == .__main__.:",
 ]
 fail_under = 95
-omit = ["<bootstrap-dir>/tests/*"]
+omit = ["tests/*"]
 
 [tool.tox]
 envlist = ["cs", "ann", "utc"]
@@ -104,8 +104,8 @@ description = "Formats code by black and isort tools"
 deps = ["black", "isort"]
 skip_install = true
 commands = [
-    ["isort", "<bootstrap-dir>"],
-    ["black", "<bootstrap-dir>"],
+    ["isort", "{dir_name}"],
+    ["black", "{dir_name}"],
 ]
 
 [tool.tox.env.cs]
@@ -113,9 +113,9 @@ description = "Checks code style by black, isort and flake8 tools"
 deps = ["black", "isort", "flake8", "flake8-pyproject"]
 skip_install = true
 commands = [
-    ["isort", "--check-only", "--diff", "<bootstrap-dir>"],
-    ["black", "--check", "--diff", "<bootstrap-dir>"],
-    ["flake8", "<bootstrap-dir>"],
+    ["isort", "--check-only", "--diff", "{dir_name}"],
+    ["black", "--check", "--diff", "{dir_name}"],
+    ["flake8", "{dir_name}"],
 ]
 
 [tool.tox.env.ann]
@@ -123,25 +123,25 @@ description = "Checks types annotations by mypy"
 deps = ["mypy"]
 skip_install = true
 commands = [
-    ["mypy", "<bootstrap-dir>"],
+    ["mypy", "{dir_name}"],
 ]
 
 [tool.tox.env.utc]
 description = "Runs tests under coverage, prints a text report and builds HTML report"
-deps = ["--requirement={toxinidir}/requirements.txt", "coverage"]
+deps = ["--requirement={{toxinidir}}/requirements.txt", "coverage"]
 commands = [
-    ["coverage", "run", "--module", "unittest", "discover", "<bootstrap-dir>/tests"],
+    ["coverage", "run", "--module", "unittest", "discover", "tests"],
     ["coverage", "report"],
     ["coverage", "html"],
 ]
 
 [tool.tox.env.doc]
 description = "Generates documentation using sphinx tool"
-deps = ["--requirement={toxinidir}/requirements.txt", "sphinx"]
+deps = ["--requirement={{toxinidir}}/requirements.txt", "sphinx"]
 allowlist_externals = ["rm"]
 commands = [
     ["rm", "-rf", "docs/modules"],
-    ["sphinx-apidoc", "--separate", "--no-toc", "--no-headings", "--module-first", "--output-dir=docs/modules", "--ext-viewcode", "<bootstrap-dir>"],
+    ["sphinx-apidoc", "--separate", "--no-toc", "--no-headings", "--module-first", "--output-dir=docs/modules", "--ext-viewcode", "{dir_name}"],
     ["sphinx-build", "-b", "html", "docs", "docs/build", "-v"],
 ]
 
@@ -163,7 +163,7 @@ skip_install = true
 passenv = [
     "PYPI_REPOSITORY_ALIAS",
 ]
-set_env.PYPI_REPOSITORY_ALIAS = { replace = "env", name = "PYPI_REPOSITORY_ALIAS", default = "testpypi"}
+set_env.PYPI_REPOSITORY_ALIAS = {{replace = "env", name = "PYPI_REPOSITORY_ALIAS", default = "testpypi"}}
 commands = [
-    ["twine", "upload", "--repository={env:PYPI_REPOSITORY_ALIAS}", "--verbose", "{posargs}"],
+    ["twine", "upload", "--repository={{env:PYPI_REPOSITORY_ALIAS}}", "--verbose", "{{posargs}}"],
 ]

@@ -1,6 +1,10 @@
+import typing as t
 from unittest import TestCase
 
-import <bootstrap-dir> as package
+import py_bootstrap as package
+
+if t.TYPE_CHECKING:
+    ...
 
 
 class PackageTestCase(TestCase):

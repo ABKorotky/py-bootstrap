@@ -1,0 +1,174 @@
+[project]
+name = "ak-py-bootstrap"
+description = "Provides functionality for bootstrapping Python projects."
+readme = "README.md"
+requires-python = ">=3.13"
+license = "Apache-2.0"
+license-files = ["LICEN[CS]E*", "AUTHORS.md"]
+authors = [{name = "Aliaksandr Karotki", email = "abkorotky@gmail.com"}]
+keywords = ["bootstrap", "python", "project", "template"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Environment :: Other Environment",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet",
+]
+dynamic = ["version", "dependencies"]
+
+[project.urls]
+repository = "https://github.com/ABKorotky/py-bootstrap.git"
+changelog = "https://github.com/ABKorotky/py-bootstrap/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = [
+    "setuptools",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "py_bootstrap.VERSION"}
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+include = ["py_bootstrap*"]
+
+[tool.setuptools.package-data]
+"*" = [
+    "*.tmpl",
+    "make.bat",
+    "Makefile",
+    "*.txt",
+]
+
+[project.scripts]
+bootstrap = "py_bootstrap.scripts.bootstrap:main"
+
+[tool.black]
+target-version = ['py313']
+line-length = 80
+
+[tool.isort]
+profile = "black"
+py_version=313
+skip = [".git", ".tox", ".venv"]
+
+[tool.flake8]
+exclude = [".git", ".tox", ".venv"]
+max-line-length = 88
+extend-ignore = ["E203", "E701"]
+import-order-style = "pep8"
+application-import-names = ["py_bootstrap"]
+
+[tool.mypy]
+check_untyped_defs = true
+exclude = "/(.venv)"
+files = "**/*.py"
+follow_imports = "silent"
+ignore_missing_imports = true
+python_version = "3.13"
+show_error_codes = true
+show_error_context = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disable_error_code = [
+    "arg-type",
+    "assignment",
+    "attr-defined",
+    "method-assign",
+]
+
+[tool.coverage.run]
+omit = ["tests/*"]
+source = ["py_bootstrap"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if t.TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+fail_under = 5
+omit = ["tests/*"]
+
+[tool.tox]
+envlist = ["cs", "ann", "utc"]
+
+[tool.tox.env.format]
+description = "Formats code by black and isort tools"
+deps = ["black", "isort"]
+skip_install = true
+commands = [
+    ["isort", "docs", "py_bootstrap", "tests"],
+    ["black", "docs", "py_bootstrap", "tests"],
+]
+
+[tool.tox.env.cs]
+description = "Checks code style by black, isort and flake8 tools"
+deps = ["black", "isort", "flake8", "flake8-pyproject"]
+skip_install = true
+commands = [
+    ["isort", "--check-only", "--diff", "docs", "py_bootstrap", "tests"],
+    ["black", "--check", "--diff", "docs", "py_bootstrap", "tests"],
+    ["flake8", "docs", "py_bootstrap", "tests"],
+]
+
+[tool.tox.env.ann]
+description = "Checks types annotations by mypy"
+deps = ["mypy"]
+skip_install = true
+commands = [
+    ["mypy", "docs", "py_bootstrap", "tests"],
+]
+
+[tool.tox.env.utc]
+description = "Runs tests under coverage, prints a text report and builds HTML report"
+deps = ["--requirement={toxinidir}/requirements.txt", "coverage"]
+commands = [
+    ["coverage", "run", "--module", "unittest", "discover", "tests"],
+    ["coverage", "report"],
+    ["coverage", "html"],
+]
+
+[tool.tox.env.doc]
+description = "Generates documentation using sphinx tool"
+deps = ["--requirement={toxinidir}/requirements.txt", "sphinx"]
+allowlist_externals = ["rm"]
+commands = [
+    ["rm", "-rf", "docs/modules"],
+    ["sphinx-apidoc", "--separate", "--no-toc", "--no-headings", "--module-first", "--output-dir=docs/modules", "--ext-viewcode", "py_bootstrap"],
+    ["sphinx-build", "-b", "html", "docs", "docs/build", "-v"],
+]
+
+[tool.tox.env.build]
+description = "Builds PIP package using build tool"
+deps = ["build"]
+skip_install = true
+allowlist_externals = ["rm"]
+commands = [
+    ["python", "-m", "build", "--sdist"],
+    ["rm", "-rf", "build"],
+]
+
+
+[tool.tox.env.upload]
+description = "Uploads generated PIP package to PyPI index"
+deps = ["twine"]
+skip_install = true
+passenv = [
+    "PYPI_REPOSITORY_ALIAS",
+]
+set_env.PYPI_REPOSITORY_ALIAS = { replace = "env", name = "PYPI_REPOSITORY_ALIAS", default = "testpypi"}
+commands = [
+    ["twine", "upload", "--repository={env:PYPI_REPOSITORY_ALIAS}", "--verbose", "{posargs}"],
+]
