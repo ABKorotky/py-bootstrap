@@ -1,4 +1,6 @@
-DESCRIPTION = "Provides bootstrapping for Python packages based on tox tool."
+DESCRIPTION = (
+    "Provides bootstrapping for Python applications based on tox tool."
+)
 
 CONTEXT = {
     "name": None,
@@ -8,17 +10,11 @@ CONTEXT = {
     "repo": None,
     "python_major": "3",
     "python_minor": "13",
-    "author": None,
-    "author_email": None,
-    "year": None,
-    "first_version_date": None,
 }
 
 CONTEXT_REQUIRED_KEYS = [
     "name",
     "description",
-    "author",
-    "author_email",
 ]
 
 

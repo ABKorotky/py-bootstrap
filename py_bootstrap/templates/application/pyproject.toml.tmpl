@@ -1,0 +1,107 @@
+[project]
+name = "{name}"
+description = "{description}"
+readme = "README.md"
+requires-python = ">={python_major}.{python_minor}"
+dynamic = ["version", "dependencies"]
+
+[tool.setuptools.dynamic]
+version = {{attr = "{dir_name}.VERSION"}}
+dependencies = {{file = ["requirements.txt"]}}
+
+[tool.black]
+target-version = ['py{python_major}{python_minor}']
+line-length = 80
+
+[tool.isort]
+profile = "black"
+py_version={python_major}{python_minor}
+skip = [".git", ".tox", ".venv"]
+
+[tool.flake8]
+exclude = [".git", ".tox", ".venv"]
+max-line-length = 88
+extend-ignore = ["E203", "E701"]
+import-order-style = "pep8"
+application-import-names = ["{dir_name}"]
+
+[tool.mypy]
+check_untyped_defs = true
+exclude = "/(.venv)"
+files = "**/*.py"
+follow_imports = "silent"
+ignore_missing_imports = true
+python_version = "{python_major}.{python_minor}"
+show_error_codes = true
+show_error_context = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disable_error_code = [
+    "arg-type",
+    "assignment",
+    "attr-defined",
+    "method-assign",
+]
+
+[tool.coverage.run]
+omit = ["tests/*"]
+source = ["{dir_name}"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if t.TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+fail_under = 95
+omit = ["tests/*"]
+
+[tool.tox]
+envlist = ["cs", "ann", "utc"]
+
+[tool.tox.env.format]
+description = "Formats code by black and isort tools"
+deps = ["black", "isort"]
+skip_install = true
+commands = [
+    ["isort", "{dir_name}"],
+    ["black", "{dir_name}"],
+]
+
+[tool.tox.env.cs]
+description = "Checks code style by black, isort and flake8 tools"
+deps = ["black", "isort", "flake8", "flake8-pyproject"]
+skip_install = true
+commands = [
+    ["isort", "--check-only", "--diff", "{dir_name}"],
+    ["black", "--check", "--diff", "{dir_name}"],
+    ["flake8", "{dir_name}"],
+]
+
+[tool.tox.env.ann]
+description = "Checks types annotations by mypy"
+deps = ["mypy"]
+skip_install = true
+commands = [
+    ["mypy", "{dir_name}"],
+]
+
+[tool.tox.env.utc]
+description = "Runs tests under coverage, prints a text report and builds HTML report"
+deps = ["--requirement={{toxinidir}}/requirements.txt", "coverage"]
+commands = [
+    ["coverage", "run", "--module", "unittest", "discover", "tests"],
+    ["coverage", "report"],
+    ["coverage", "html"],
+]
+
+[tool.tox.env.doc]
+description = "Generates documentation using sphinx tool"
+deps = ["--requirement={{toxinidir}}/requirements.txt", "sphinx"]
+allowlist_externals = ["rm"]
+commands = [
+    ["rm", "-rf", "docs/modules"],
+    ["sphinx-apidoc", "--separate", "--no-toc", "--no-headings", "--module-first", "--output-dir=docs/modules", "--ext-viewcode", "{dir_name}"],
+    ["sphinx-build", "-b", "html", "docs", "docs/build", "-v"],
+]

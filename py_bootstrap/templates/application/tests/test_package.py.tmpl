@@ -1,0 +1,10 @@
+from unittest import TestCase
+
+import {dir_name} as package
+
+
+class PackageTestCase(TestCase):
+    def test_package(self):
+        assert package.NAME
+        assert package.VERSION
+        assert package.PY_VERSION
