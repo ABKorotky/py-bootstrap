@@ -18,7 +18,13 @@ logger = logging.getLogger(__name__)
 class RegisterBootstrapOperation(BaseBootstrapOperation):
     cli_description = "Register an user bootstrap."
 
-    excluded_directories: list[str] = ["__pycache__"]
+    excluded_directories: list[str] = [
+        ".tox",
+        ".venv",
+        "dist",
+        "htmlcov",
+        "__pycache__",
+    ]
     excluded_file_extensions: list[str] = ["pyo", "pyc"]
 
     @classmethod
