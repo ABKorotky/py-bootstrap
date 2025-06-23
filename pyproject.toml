@@ -71,7 +71,7 @@ application-import-names = ["py_bootstrap"]
 
 [tool.mypy]
 check_untyped_defs = true
-exclude = "/(.venv)"
+exclude = "/(.venv|templates|tst-templates)"
 files = "**/*.py"
 follow_imports = "silent"
 ignore_missing_imports = true
@@ -98,7 +98,7 @@ exclude_lines = [
     "if t.TYPE_CHECKING:",
     "if __name__ == .__main__.:",
 ]
-fail_under = 5
+fail_under = 95
 omit = ["tests/*"]
 
 [tool.tox]

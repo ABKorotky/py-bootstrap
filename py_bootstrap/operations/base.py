@@ -1,21 +1,14 @@
-__all__ = (
-    "BaseBootstrapsOperation",
-    "BaseBootstrapOperation",
-)
+__all__ = ("BaseBootstrapsOperation",)
 
 import logging
-import os
 import typing as t
-from argparse import ArgumentTypeError
-from copy import deepcopy
-from functools import cached_property
 from importlib import import_module
+from pathlib import Path
 
 import py_bootstrap as package
 from py_bootstrap.base.operations import BaseCliOperation
 
 if t.TYPE_CHECKING:
-    from argparse import ArgumentParser
     from types import ModuleType
 
 
@@ -23,78 +16,55 @@ logger = logging.getLogger(__name__)
 
 
 class BaseBootstrapsOperation(BaseCliOperation):
-    package = package
+    package: "ModuleType" = package
     templates_dir_name = "templates"
-    metadata_module_name = "__metadata__"
+    entry_point_module_name = "__entry_point__"
 
-    @property
-    def package_path(self) -> str:
-        return self.package.__path__[0]
+    package_path: "Path"
+    templates_path: "Path"
 
-    def load_bootstrap_metadata(self, name: str) -> "ModuleType":
+    def __init_subclass__(cls, **kwargs):
+        assert cls.package.__file__ is not None
+        cls.package_path = Path(cls.package.__file__).parent
+        cls.templates_path = cls.package_path.joinpath(cls.templates_dir_name)
+
+    @classmethod
+    def import_bootstrap_entry_point(cls, dir_path: "Path") -> "ModuleType":
+        venv_rel_path = dir_path.relative_to(cls.package_path.parent)
+        import_path = ".".join(
+            venv_rel_path.parts + (cls.entry_point_module_name,)
+        )
         try:
-            return import_module(
-                f"{self.package.__name__}.{self.templates_dir_name}.{name}"
-                f".{self.metadata_module_name}"
-            )
+            return import_module(import_path)
         except ImportError as err:
             logger.error(
-                "%r. failed to import metadata for %r: %s.", self, name, err
+                "%r. failed to import entry point by %r: %s.",
+                cls,
+                import_path,
+                err,
             )
-            raise Exception("Loading bootstrap metadata") from err
-
-
-class BaseBootstrapOperation(BaseBootstrapsOperation):
+            raise Exception(f"Importing {import_path} entry point") from err
 
     @classmethod
-    def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""):
-        parser.add_argument(
-            "-n",
-            "--name",
-            dest="name",
-            type=str,
-            required=True,
-            help="Name of the bootstrap.",
+    def find_bootstraps(cls) -> t.Iterator[tuple[str, "ModuleType"]]:
+        logger.debug(
+            "%r. directory with templates: %r.", cls, cls.templates_path
         )
-        parser.add_argument(
-            "-c",
-            "--context",
-            dest="context_overrides",
-            action="append",
-            default=[],
-            help=(
-                "Context overrides in the form of key:value pairs."
-                " Can be specified multiple times."
-            ),
-            type=cls.validate_cli_argument_context,
-        )
+        for template_dir in cls.templates_path.iterdir():
+            if not template_dir.is_dir():
+                continue
 
-    @classmethod
-    def validate_cli_argument_context(cls, value: str) -> str:
-        if ":" not in value:
-            raise ArgumentTypeError(
-                f"Malformed context value: {value}. Expected format is key:value."
-            )
-        return value
+            logger.debug("%r. found a template: %r.", cls, template_dir)
 
-    @property
-    def name(self) -> str:
-        return self._cli_namespace.name
+            name = template_dir.name
+            if name.startswith("__") or name.startswith("."):
+                continue
 
-    @cached_property
-    def bootstrap_path(self) -> str:
-        return os.path.join(
-            self.package_path, self.templates_dir_name, self.name
-        )
+            try:
+                metadata_module = cls.import_bootstrap_entry_point(
+                    dir_path=template_dir
+                )
+            except Exception:
+                continue
 
-    @cached_property
-    def metadata_module(self) -> "ModuleType":
-        return self.load_bootstrap_metadata(name=self.name)
-
-    @cached_property
-    def context(self) -> dict[str, str]:
-        ctx = deepcopy(self.metadata_module.CONTEXT)
-        for override in self._cli_namespace.context_overrides:
-            key, value = override.split(":", 1)
-            ctx[key] = value
-        return ctx
+            yield name, metadata_module

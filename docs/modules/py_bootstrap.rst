@@ -13,5 +13,6 @@ Subpackages
    :maxdepth: 4
 
    py_bootstrap.base
+   py_bootstrap.files_processors
    py_bootstrap.operations
    py_bootstrap.scripts

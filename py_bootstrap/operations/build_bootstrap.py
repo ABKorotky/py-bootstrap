@@ -1,12 +1,20 @@
-__all__ = ("BuildBootstrapOperation",)
+__all__ = (
+    "BuildBootstrapsDispatcherOperation",
+    "BaseBuildBootstrapOperation",
+)
 
 import logging
 import os
+import re
 import typing as t
+from datetime import datetime
 from functools import cached_property
-from shutil import copyfile
+from pathlib import Path
 
-from .base import BaseBootstrapOperation
+from py_bootstrap import PY_VERSION
+from py_bootstrap.files_processors import GenerateFilesProcessor
+
+from .base import BaseBootstrapsOperation
 
 if t.TYPE_CHECKING:
     from argparse import ArgumentParser
@@ -15,15 +23,11 @@ if t.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class BuildBootstrapOperation(BaseBootstrapOperation):
-    cli_description = "Generates a skeleton of project from given bootstrap."
-
-    excluded_directories: list[str] = ["__pycache__"]
-    excluded_file_extensions: list[str] = []
+class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):
+    cli_description = "Generates a skeleton of something from given bootstrap."
 
     @classmethod
     def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""):
-        super().prepare_cli_parser(parser=parser, prefix=prefix)
         parser.add_argument(
             "--dest",
             dest="destination_dir",
@@ -35,39 +39,123 @@ class BuildBootstrapOperation(BaseBootstrapOperation):
             ),
         )
 
-    @cached_property
-    def destination_path(self) -> str:
-        if not self._cli_namespace.destination_dir:
-            return os.getcwd()
-        return os.path.join(os.getcwd(), self._cli_namespace.destination_dir)
+        subparsers = parser.add_subparsers(
+            title="Found bootstraps", dest="bootstrap", required=True
+        )
+        # prepare parsers for templates
+        for name, entry_point_module in cls.find_bootstraps():
+            template_parser = subparsers.add_parser(
+                name,
+                description=entry_point_module.DESCRIPTION,
+                help=entry_point_module.DESCRIPTION,
+            )
+            entry_point_module.BuildOperation.prepare_cli_parser(
+                parser=template_parser, prefix=name
+            )
 
     def run(self):
-        self.validate_context()
-        self.prepare_context()
+        bootstrap_name = self.cli_namespace.bootstrap
+        entry_points_modules_map = dict(self.find_bootstraps())
+
+        entry_point_module = entry_points_modules_map[bootstrap_name]
+
+        try:
+            operation: "BaseBuildBootstrapOperation" = (
+                entry_point_module.BuildOperation()
+            )
+        except AttributeError as err:
+            logger.error(
+                "%r. metadata does not contain BuildOperation attribute: %r.",
+                self,
+                entry_point_module,
+            )
+            raise Exception(
+                f"Invalid metadata module for {bootstrap_name}"
+            ) from err
+        except Exception as err:
+            logger.exception(
+                "%r. unable to create operation instance from: %r. error: %r.",
+                self,
+                entry_point_module.Operation,
+                err,
+            )
+            raise Exception(
+                f"BuildOperation creation failed for {bootstrap_name}"
+            ) from err
+
+        operation.set_cli_namespace(self.cli_namespace)
+        operation.run()
+
+
+class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
+    entry_point_path: t.ClassVar[str]
+    cli_argument_name_help: t.ClassVar[str]
+
+    _context: dict[str, str]
+
+    @classmethod
+    def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""):
+        parser.add_argument(
+            "--name",
+            dest="name",
+            type=cls.validate_cli_argument_name,
+            required=True,
+            help=cls.cli_argument_name_help,
+        )
+        parser.add_argument(
+            "--description",
+            dest="description",
+            type=str,
+            required=True,
+            help="Description of the application.",
+        )
+
+    @classmethod
+    def validate_cli_argument_name(cls, value: str) -> str:
+        if not re.match(r"^[a-z0-9-]+$", value):
+            raise ValueError(
+                "The name can only contain alphanumeric characters and hyphens."
+            )
+        return value
+
+    @cached_property
+    def bootstrap_path(self) -> "Path":
+        return Path(self.entry_point_path).parent
+
+    @cached_property
+    def destination_path(self) -> "Path":
+        if self.cli_namespace.destination_dir:
+            return Path(os.getcwd(), self._cli_namespace.destination_dir)
+        return Path.cwd()
+
+    def run(self):
+        self._context = self.build_context()
         self.create_destination_dir()
         self.populate_destination_dir()
 
-    def validate_context(self):
-        try:
-            self.metadata_module.validate_context(context=self.context)
-        except Exception as err:
-            logger.error(
-                "Unable to validate context for the %r bootstrap. Error: %r.",
-                self.name,
-                err,
-            )
-            raise Exception("Context is invalid") from err
+    def build_context(self) -> dict[str, str]:
+        name = self.cli_namespace.name.strip()
+        name_parts: list[str] = name.split("-")
 
-    def prepare_context(self):
-        try:
-            self.metadata_module.prepare_context(context=self.context)
-        except Exception as err:
-            logger.error(
-                "Unable to prepare context for the %r bootstrap. Error: %r.",
-                self.name,
-                err,
-            )
-            raise Exception("Preparing context") from err
+        underscored_name = "_".join(name_parts)
+        upper_name = "_".join(i.upper() for i in name_parts)
+        class_name = "".join(i.title() for i in name_parts)
+        title = " ".join(i.title() for i in name_parts)
+
+        now = datetime.now()
+        return {
+            "name": name,
+            "underscored_name": underscored_name,
+            "upper_name": upper_name,
+            "class_name": class_name,
+            "title": title,
+            "description": self.cli_namespace.description.strip(),
+            "empty": "",
+            "date_today": now.strftime("%Y-%m-%d"),
+            "date_year": str(now.year),
+            "python_major": str(PY_VERSION[0]),
+            "python_minor": str(PY_VERSION[1]),
+        }
 
     def create_destination_dir(self):
         try:
@@ -81,152 +169,11 @@ class BuildBootstrapOperation(BaseBootstrapOperation):
             raise Exception("Creating destination directory") from err
 
     def populate_destination_dir(self):
-        logger.debug(
-            "Fill %r directory from %r.",
-            self.destination_path,
-            self.bootstrap_path,
+        processor = GenerateFilesProcessor()
+        processor.set_source_path(source_path=self.bootstrap_path)
+        processor.set_destination_path(destination_path=self.destination_path)
+        processor.set_context(value=self._context)
+        processor.set_entry_point_file_name(
+            value=f"{self.entry_point_module_name}.py"
         )
-        for root_path, dirs_names, files_names in os.walk(self.bootstrap_path):
-            logger.debug("Process %r source root.", root_path)
-            rel_path = os.path.normpath(
-                os.path.relpath(root_path, start=self.bootstrap_path)
-            )
-            destination_base_path = os.path.join(
-                self.destination_path, rel_path
-            )
-
-            for dir_name in dirs_names:
-                if not self.check_directory_for_generating(dir_name=dir_name):
-                    logger.debug(
-                        "Directory %s/%s is skipped from generating.",
-                        root_path,
-                        dir_name,
-                    )
-                    continue
-
-                try:
-                    self.generate_directory(
-                        destination_base_path=destination_base_path,
-                        dir_name=dir_name,
-                    )
-                except Exception as err:
-                    logger.warning(
-                        "Unable to generate %r/%r directory. Error: %r.",
-                        root_path,
-                        dir_name,
-                        err,
-                    )
-                else:
-                    logger.debug(
-                        "Directory %s/%s is generated successfully.",
-                        root_path,
-                        dir_name,
-                    )
-
-            for full_file_name in files_names:
-                file_name, file_ext = os.path.splitext(full_file_name)
-                if not self.check_file_for_generating(
-                    file_name=file_name, file_ext=file_ext
-                ):
-                    logger.debug(
-                        "File %s/%s is skipped from generating.",
-                        root_path,
-                        file_name,
-                    )
-                    continue
-
-                try:
-                    self.generate_file(
-                        source_base_path=root_path,
-                        destination_base_path=destination_base_path,
-                        file_name=file_name,
-                        file_ext=file_ext,
-                    )
-                except Exception as err:
-                    logger.warning(
-                        "Unable to generate %r/%r file. Error: %r.",
-                        root_path,
-                        full_file_name,
-                        err,
-                    )
-                else:
-                    logger.debug(
-                        "File %s/%s is generated successfully.",
-                        root_path,
-                        full_file_name,
-                    )
-
-    def check_directory_for_generating(self, dir_name: str) -> bool:
-        return dir_name not in self.excluded_directories
-
-    def generate_directory(self, destination_base_path: str, dir_name: str):
-        destination_path = os.path.join(destination_base_path, dir_name)
-        destination_path = self.generate_content_from_template(
-            template=destination_path
-        )
-        try:
-            os.makedirs(destination_path)
-        except FileExistsError:
-            ...
-        else:
-            logger.info("Directory %r is created.", destination_path)
-
-    def check_file_for_generating(self, file_name: str, file_ext: str) -> bool:
-        if file_name.startswith(self.metadata_module_name):
-            return False
-        return file_ext not in self.excluded_file_extensions
-
-    def generate_file(
-        self,
-        source_base_path: str,
-        destination_base_path: str,
-        file_name: str,
-        file_ext: str,
-    ):
-        source_path = os.path.join(source_base_path, file_name + file_ext)
-        if file_ext == ".tmpl":
-            destination_path = self.generate_content_from_template(
-                template=os.path.join(destination_base_path, file_name)
-            )
-            self.generate_file_from_template(
-                source_path=source_path,
-                destination_path=destination_path,
-            )
-        else:
-            destination_path = self.generate_content_from_template(
-                template=os.path.join(
-                    destination_base_path, file_name + file_ext
-                )
-            )
-            self.generate_file_from_copy(
-                source_path=source_path, destination_path=destination_path
-            )
-
-    def generate_file_from_template(
-        self, source_path: str, destination_path: str
-    ):
-        source_rel_path = os.path.relpath(source_path)
-        destination_rel_path = os.path.relpath(destination_path)
-        with open(source_path) as fd:
-            origin_content = fd.read()
-        prepared_content = self.generate_content_from_template(
-            template=origin_content
-        )
-        with open(destination_path, mode="w+") as fd:
-            fd.write(prepared_content)
-        logger.info(
-            "Create %s file from the %s template.",
-            destination_rel_path,
-            source_rel_path,
-        )
-
-    def generate_file_from_copy(self, source_path: str, destination_path: str):
-        source_rel_path = os.path.relpath(source_path)
-        destination_rel_path = os.path.relpath(destination_path)
-        copyfile(source_path, destination_path)
-        logger.info(
-            "Copy %s file to %s.", source_rel_path, destination_rel_path
-        )
-
-    def generate_content_from_template(self, template: str) -> str:
-        return template.format(**self.context)
+        processor.run()

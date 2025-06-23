@@ -1,41 +1,15 @@
 import typing as t
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser
 from unittest import TestCase
 
 from py_bootstrap.base.operations import (
     BaseCliOperation,
-    BaseOperation,
-    BaseOperationsDispatcher,
     BaseOperationsRunner,
+    BaseRecursiveOperationsContainer,
 )
 
 if t.TYPE_CHECKING:
     ...
-
-
-class BaseOperationTestCase(TestCase):
-    tst_cls = BaseOperation
-
-    def setUp(self):
-        self.tst_obj = self.tst_cls()
-
-    def test_run(self):
-        with self.assertRaises(NotImplementedError):
-            self.tst_obj.run()
-
-
-class BaseCliOperationTestCase(BaseOperationTestCase):
-    tst_cls = BaseCliOperation
-    tst_obj: BaseCliOperation
-
-    def test_prepare_cli_parser(self):
-        with self.assertRaises(NotImplementedError):
-            self.tst_cls.prepare_cli_parser(ArgumentParser())
-
-    def test_set_cli_namespace(self):
-        namespace = Namespace()
-        self.tst_obj.set_cli_namespace(namespace=namespace)
-        assert self.tst_obj._cli_namespace == namespace
 
 
 class TstOperation(BaseCliOperation):
@@ -50,25 +24,25 @@ class TstOperation(BaseCliOperation):
         self.is_run = True
 
 
-class TstNestedTwoDispatcher(BaseOperationsDispatcher):
+class TstNestedTwoContainer(BaseRecursiveOperationsContainer):
     cli_description = "Test nested two operations dispatcher"
     operations_classes_map = {
         "test": TstOperation,
     }
 
 
-class TstNestedOneDispatcher(BaseOperationsDispatcher):
+class TstNestedOneContainer(BaseRecursiveOperationsContainer):
     cli_description = "Test nested one operations dispatcher"
     operations_classes_map = {
-        "nested-two": TstNestedTwoDispatcher,
+        "nested-two": TstNestedTwoContainer,
         "test": TstOperation,
     }
 
 
-class TstRootDispatcher(BaseOperationsDispatcher):
+class TstRootDispatcher(BaseRecursiveOperationsContainer):
     cli_description = "Test root operations dispatcher"
     operations_classes_map = {
-        "nested-one": TstNestedOneDispatcher,
+        "nested-one": TstNestedOneContainer,
     }
 
 
@@ -91,11 +65,11 @@ class BaseOperationsRunnerTestCase(TestCase):
         self.tst_obj.run()
         assert isinstance(self.tst_obj._operation, TstRootDispatcher)
         assert isinstance(
-            self.tst_obj._operation._operation, TstNestedOneDispatcher
+            self.tst_obj._operation._operation, TstNestedOneContainer
         )
         assert isinstance(
             self.tst_obj._operation._operation._operation,
-            TstNestedTwoDispatcher,
+            TstNestedTwoContainer,
         )
         assert isinstance(
             self.tst_obj._operation._operation._operation._operation,

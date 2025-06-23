@@ -13,13 +13,13 @@ import typing as t
 
 sys.path.insert(0, os.path.abspath(".."))
 
-import {dir_name} as package  # noqa
+import {underscored_name} as package  # noqa
 
 # -- Project information -----------------------------------------------------
 
 project = package.TITLE
 author = package.AUTHOR
-copyright = f"{year}, {author}"
+copyright = f"{date_year}, {author}"
 
 # The full version, including alpha/beta/rc tags
 release = ".".join([str(i) for i in package.VERSION])

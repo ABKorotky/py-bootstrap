@@ -6,8 +6,8 @@ py\_bootstrap.base package
    :show-inheritance:
    :undoc-members:
 
-Submodules
-----------
+Subpackages
+-----------
 
 .. toctree::
    :maxdepth: 4
