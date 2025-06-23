@@ -1,18 +1,15 @@
 __all__ = (
-    "BuildBootstrapsDispatcherOperation",
-    "BaseBuildBootstrapOperation",
+    "ExportBootstrapsDispatcherOperation",
+    "BaseExportBootstrapOperation",
 )
 
 import logging
 import os
-import re
 import typing as t
-from datetime import datetime
 from functools import cached_property
 from pathlib import Path
 
-from py_bootstrap import PY_VERSION
-from py_bootstrap.files_processors import GenerateFilesProcessor
+from py_bootstrap.files_processors import CopyFilesProcessor
 
 from .base import BaseBootstrapsOperation
 
@@ -23,8 +20,8 @@ if t.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):
-    cli_description = "Generates a skeleton of something from given bootstrap."
+class ExportBootstrapsDispatcherOperation(BaseBootstrapsOperation):
+    cli_description = "Exports a bootstrap by given name."
 
     @classmethod
     def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""):
@@ -34,7 +31,7 @@ class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):
             type=str,
             default="",
             help=(
-                "Specifies the destination directory for generating."
+                "Specifies the destination directory for exporting."
                 " Current directory by default."
             ),
         )
@@ -46,10 +43,10 @@ class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):
         for name, entry_point_module in cls.find_bootstraps():
             template_parser = subparsers.add_parser(
                 name,
-                description=entry_point_module.BuildOperation.cli_description,
-                help=entry_point_module.BuildOperation.cli_description,
+                description=entry_point_module.ExportOperation.cli_description,
+                help=entry_point_module.ExportOperation.cli_description,
             )
-            entry_point_module.BuildOperation.prepare_cli_parser(
+            entry_point_module.ExportOperation.prepare_cli_parser(
                 parser=template_parser, prefix=name
             )
 
@@ -60,8 +57,8 @@ class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):
         entry_point_module = entry_points_modules_map[bootstrap_name]
 
         try:
-            operation: "BaseBuildBootstrapOperation" = (
-                entry_point_module.BuildOperation()
+            operation: "BaseExportBootstrapOperation" = (
+                entry_point_module.ExportOperation()
             )
         except AttributeError as err:
             logger.error(
@@ -87,36 +84,11 @@ class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):
         operation.run()
 
 
-class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
+class BaseExportBootstrapOperation(BaseBootstrapsOperation):
     entry_point_path: t.ClassVar[str]
-    cli_argument_name_help: t.ClassVar[str]
-
-    _context: dict[str, str]
 
     @classmethod
-    def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""):
-        parser.add_argument(
-            "--name",
-            dest="name",
-            type=cls.validate_cli_argument_name,
-            required=True,
-            help=cls.cli_argument_name_help,
-        )
-        parser.add_argument(
-            "--description",
-            dest="description",
-            type=str,
-            required=True,
-            help="Description of the application.",
-        )
-
-    @classmethod
-    def validate_cli_argument_name(cls, value: str) -> str:
-        if not re.match(r"^[a-z0-9-]+$", value):
-            raise ValueError(
-                "The name can only contain alphanumeric characters and hyphens."
-            )
-        return value
+    def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""): ...
 
     @cached_property
     def bootstrap_path(self) -> "Path":
@@ -129,33 +101,8 @@ class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
         return Path.cwd()
 
     def run(self):
-        self._context = self.build_context()
         self.create_destination_dir()
         self.populate_destination_dir()
-
-    def build_context(self) -> dict[str, str]:
-        name = self.cli_namespace.name.strip()
-        name_parts: list[str] = name.split("-")
-
-        underscored_name = "_".join(name_parts)
-        upper_name = "_".join(i.upper() for i in name_parts)
-        class_name = "".join(i.title() for i in name_parts)
-        title = " ".join(i.title() for i in name_parts)
-
-        now = datetime.now()
-        return {
-            "name": name,
-            "underscored_name": underscored_name,
-            "upper_name": upper_name,
-            "class_name": class_name,
-            "title": title,
-            "description": self.cli_namespace.description.strip(),
-            "empty": "",
-            "date_today": now.strftime("%Y-%m-%d"),
-            "date_year": str(now.year),
-            "python_major": str(PY_VERSION[0]),
-            "python_minor": str(PY_VERSION[1]),
-        }
 
     def create_destination_dir(self):
         try:
@@ -169,11 +116,7 @@ class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
             raise Exception("Creating destination directory") from err
 
     def populate_destination_dir(self):
-        processor = GenerateFilesProcessor()
+        processor = CopyFilesProcessor()
         processor.set_source_path(source_path=self.bootstrap_path)
         processor.set_destination_path(destination_path=self.destination_path)
-        processor.set_context(value=self._context)
-        processor.set_entry_point_file_name(
-            value=f"{self.entry_point_module_name}.py"
-        )
         processor.run()

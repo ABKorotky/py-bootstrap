@@ -25,21 +25,23 @@ class MainTestCase(TestCase):
 
         output = mock_stdout.getvalue()
         """
-        usage: bootstrap [-h] {list,build,register} ...
+        usage: bootstrap [-h] {list,build,export,register} ...
         Bootstrapping Python projects management tool.
         options:
           -h, --help            show this help message and exit
         Bootstraps management operations:
-          {list,build,register}
+          {list,build,export,register}
             list                Finds and prints the list of available bootstraps with
                                 brief description.
-            build               Generates a skeleton of something from given template.
+            build               Generates a skeleton of something from given
+                                bootstrap.
+            export              Exports a bootstrap by given name.
             register            Registers a new bootstrap.
         """
         assert "usage: bootstrap [-h]" in output
         assert "Bootstrapping Python projects management tool" in output
         assert "Bootstraps management operations" in output
-        assert "{list,build,register}" in output
+        assert "{list,build,export,register}" in output
 
     def test_list_bootstraps_help(self):
         mock_stdout = io.StringIO()
@@ -149,6 +151,9 @@ class MainTestCase(TestCase):
 
             assert os.path.exists(destination_path)
 
+            assert not os.path.exists(
+                os.path.join(destination_path, "__entry_point__.py")
+            )
             assert os.path.isfile(os.path.join(destination_path, ".gitignore"))
             assert os.path.isfile(
                 os.path.join(destination_path, "CHANGELOG.md")
@@ -210,7 +215,7 @@ class MainTestCase(TestCase):
         usage: bootstrap build package [-h] --name NAME --description DESCRIPTION
                                --author AUTHOR --author-email AUTHOR_EMAIL
                                [--repo REPO]
-        Generates a skeleton of Python Package
+        Generates a skeleton of a Python Package
         options:
           -h, --help            show this help message and exit
           --name NAME           The name of the package
@@ -222,7 +227,7 @@ class MainTestCase(TestCase):
           --repo REPO           Repository URL for the application.
         """
         assert "usage: bootstrap build package [-h]" in output
-        assert "Generates a skeleton of Python Package" in output
+        assert "Generates a skeleton of a Python Package" in output
         assert "--name NAME" in output
         assert "--description DESCRIPTION" in output
         assert "--author AUTHOR" in output
@@ -252,6 +257,9 @@ class MainTestCase(TestCase):
 
             assert os.path.exists(destination_path)
 
+            assert not os.path.exists(
+                os.path.join(destination_path, "__entry_point__.py")
+            )
             assert os.path.isfile(os.path.join(destination_path, ".gitignore"))
             assert os.path.isfile(os.path.join(destination_path, "AUTHORS.md"))
             assert os.path.isfile(
@@ -296,6 +304,227 @@ class MainTestCase(TestCase):
             )
             assert os.path.isfile(
                 os.path.join(destination_path, "tests", "test_package.py")
+            )
+        finally:
+            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+
+    def test_export_bootstrap_help(self):
+        mock_stdout = io.StringIO()
+        with (
+            self.assertRaises(SystemExit),
+            contextlib.redirect_stdout(mock_stdout),
+        ):
+            main(cli_args=["export", "--help"])
+
+        output = mock_stdout.getvalue()
+        """
+        usage: bootstrap export [-h] [--dest DESTINATION_DIR]
+                                {application,package} ...
+        Exports a bootstrap by given name.
+        options:
+          -h, --help            show this help message and exit
+          --dest DESTINATION_DIR
+                                Specifies the destination directory for exporting.
+                                Current directory by default.
+        Found bootstraps:
+          {application,package}
+            application         Exports a Python Application bootstrap template
+            package             Exports a Python Package bootstrap template
+        """
+        assert "usage: bootstrap export [-h]" in output
+        assert "Exports a bootstrap by given name" in output
+        assert "--dest DESTINATION_DIR" in output
+        assert "Found bootstraps" in output
+        assert "{application,package}" in output
+
+    def test_export_bootstrap_application_help(self):
+        mock_stdout = io.StringIO()
+        with (
+            self.assertRaises(SystemExit),
+            contextlib.redirect_stdout(mock_stdout),
+        ):
+            main(cli_args=["export", "application", "--help"])
+
+        output = mock_stdout.getvalue()
+        """
+        usage: bootstrap export application [-h]
+        Exports a Python Application bootstrap template
+        options:
+          -h, --help  show this help message and exit
+        """
+        assert "usage: bootstrap export application [-h]" in output
+        assert "Exports a Python Application bootstrap template" in output
+
+    def test_export_bootstrap_application(self):
+        destination_path = "tst-application-destination"
+        try:
+            mock_stdout = io.StringIO()
+            with contextlib.redirect_stdout(mock_stdout):
+                main(
+                    cli_args=[
+                        "export",
+                        f"--dest={destination_path}",
+                        "application",
+                    ]
+                )
+
+            output = mock_stdout.getvalue()
+            assert not output
+
+            assert os.path.exists(destination_path)
+
+            assert os.path.exists(
+                os.path.join(destination_path, "__entry_point__.py")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "{empty}.gitignore.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "CHANGELOG.md.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "pyproject.toml.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "README.md.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "requirements.txt")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "requirements-dev.txt")
+            )
+
+            assert os.path.isdir(os.path.join(destination_path, "docs"))
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "__init__.py")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "conf.py.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "index.rst.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "make.bat")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "Makefile")
+            )
+
+            assert os.path.isdir(
+                os.path.join(destination_path, "{underscored_name}")
+            )
+            assert os.path.isfile(
+                os.path.join(
+                    destination_path, "{underscored_name}", "__init__.py.tmpl"
+                )
+            )
+
+            assert os.path.isdir(os.path.join(destination_path, "tests"))
+            assert os.path.isfile(
+                os.path.join(destination_path, "tests", "__init__.py")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "tests", "test_app.py.tmpl")
+            )
+
+        finally:
+            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+
+    def test_export_bootstrap_package_help(self):
+        mock_stdout = io.StringIO()
+        with (
+            self.assertRaises(SystemExit),
+            contextlib.redirect_stdout(mock_stdout),
+        ):
+            main(cli_args=["export", "package", "--help"])
+
+        output = mock_stdout.getvalue()
+        """
+        usage: bootstrap export package [-h]
+        Exports a Python Package bootstrap template
+        options:
+          -h, --help  show this help message and exit
+        """
+        assert "usage: bootstrap export package [-h]" in output
+        assert "Exports a Python Package bootstrap template" in output
+
+    def test_export_bootstrap_package(self):
+        destination_path = "tst-package-destination"
+        try:
+            mock_stdout = io.StringIO()
+            with contextlib.redirect_stdout(mock_stdout):
+                main(
+                    cli_args=[
+                        "export",
+                        f"--dest={destination_path}",
+                        "package",
+                    ]
+                )
+
+            output = mock_stdout.getvalue()
+            assert not output
+
+            assert os.path.exists(destination_path)
+
+            assert os.path.exists(
+                os.path.join(destination_path, "__entry_point__.py")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "{empty}.gitignore.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "AUTHORS.md.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "CHANGELOG.md.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "pyproject.toml.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "README.md.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "requirements.txt")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "requirements-dev.txt")
+            )
+
+            assert os.path.isdir(os.path.join(destination_path, "docs"))
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "__init__.py")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "conf.py.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "index.rst.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "make.bat")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "docs", "Makefile")
+            )
+
+            assert os.path.isdir(
+                os.path.join(destination_path, "{underscored_name}")
+            )
+            assert os.path.isfile(
+                os.path.join(
+                    destination_path, "{underscored_name}", "__init__.py.tmpl"
+                )
+            )
+
+            assert os.path.isdir(os.path.join(destination_path, "tests"))
+            assert os.path.isfile(
+                os.path.join(destination_path, "tests", "__init__.py")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "tests", "test_package.py.tmpl")
             )
         finally:
             shutil.rmtree(os.path.join(os.getcwd(), destination_path))

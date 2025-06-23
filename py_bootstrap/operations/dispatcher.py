@@ -5,6 +5,7 @@ import typing as t
 
 from .base import BaseBootstrapsOperation
 from .build_bootstrap import BuildBootstrapsDispatcherOperation
+from .export_bootstrap import ExportBootstrapsDispatcherOperation
 from .list_bootstraps import ListBootstrapsOperation
 from .register_bootstrap import RegisterBootstrapOperation
 
@@ -19,6 +20,7 @@ class BootstrapsDispatcher(BaseBootstrapsOperation):
 
     op_list_cls = ListBootstrapsOperation
     op_build_cls = BuildBootstrapsDispatcherOperation
+    op_export_cls = ExportBootstrapsDispatcherOperation
     op_register_cls = RegisterBootstrapOperation
 
     @classmethod
@@ -42,6 +44,15 @@ class BootstrapsDispatcher(BaseBootstrapsOperation):
         )
         cls.op_build_cls.prepare_cli_parser(parser=build_parser, prefix="build")
 
+        export_parser = subparsers.add_parser(
+            "export",
+            description=cls.op_export_cls.cli_description,
+            help=cls.op_export_cls.cli_description,
+        )
+        cls.op_export_cls.prepare_cli_parser(
+            parser=export_parser, prefix="export"
+        )
+
         register_parser = subparsers.add_parser(
             "register",
             description=cls.op_register_cls.cli_description,
@@ -59,6 +70,8 @@ class BootstrapsDispatcher(BaseBootstrapsOperation):
                 operation = self.op_list_cls()
             case "build":
                 operation = self.op_build_cls()
+            case "export":
+                operation = self.op_export_cls()
             case "register":
                 operation = self.op_register_cls()
             case _:

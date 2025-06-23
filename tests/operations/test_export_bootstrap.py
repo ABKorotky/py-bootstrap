@@ -7,24 +7,24 @@ from argparse import Namespace
 from unittest import TestCase
 
 import tests as tst_package
-from py_bootstrap.operations import BaseBuildBootstrapOperation
+from py_bootstrap.operations import BaseExportBootstrapOperation
 
 if t.TYPE_CHECKING:
     ...
 
 
-class TstOperation(BaseBuildBootstrapOperation):
+class TstOperation(BaseExportBootstrapOperation):
     package = tst_package
     templates_dir_name = "tst-templates"
     entry_point_path = os.path.join(
         os.path.dirname(tst_package.__file__),
         templates_dir_name,
         "test_bootstrap",
-        f"{BaseBuildBootstrapOperation.entry_point_module_name}.py",
+        f"{BaseExportBootstrapOperation.entry_point_module_name}.py",
     )
 
 
-class BaseBuildBootstrapOperationTestCase(TestCase):
+class BaseExportBootstrapOperationTestCase(TestCase):
 
     tst_cls = TstOperation
     tst_obj: TstOperation
@@ -40,8 +40,6 @@ class BaseBuildBootstrapOperationTestCase(TestCase):
     def test_run(self):
         namespace = Namespace(
             destination_dir="test-destination",
-            name="test-name",
-            description="Test project description",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
 
@@ -60,13 +58,19 @@ class BaseBuildBootstrapOperationTestCase(TestCase):
             os.path.join(destination_path, "some-dir", "copied-file.txt")
         )
 
-        assert os.path.isdir(os.path.join(destination_path, "test_name"))
+        assert os.path.isdir(
+            os.path.join(destination_path, "{underscored_name}")
+        )
         assert os.path.isfile(
-            os.path.join(destination_path, "test_name", "generated-file.txt")
+            os.path.join(
+                destination_path,
+                "{underscored_name}",
+                "generated-file.txt.tmpl",
+            )
         )
 
         assert os.path.isfile(os.path.join(destination_path, "some-file.txt"))
-        assert not os.path.isfile(
+        assert os.path.isfile(
             os.path.join(
                 destination_path, f"{self.tst_obj.entry_point_module_name}.py"
             )
@@ -75,8 +79,6 @@ class BaseBuildBootstrapOperationTestCase(TestCase):
     def test_run_on_existed_directory(self):
         namespace = Namespace(
             destination_dir="test-destination",
-            name="test",
-            description="Test project description",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
 
@@ -103,8 +105,6 @@ class BaseBuildBootstrapOperationTestCase(TestCase):
     def test_run_unable_create_destination_dir(self):
         namespace = Namespace(
             destination_dir="test-destination",
-            name="test",
-            description="Test project description",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
 

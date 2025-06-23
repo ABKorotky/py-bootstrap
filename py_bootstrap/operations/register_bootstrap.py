@@ -103,6 +103,14 @@ class RegisterBootstrapOperation(BaseBootstrapsOperation):
             raise Exception(
                 "BuildOperation class is missed in entry-point file"
             )
+        if "ExportOperation" not in content:
+            logger.error(
+                "%r. entry-point file does not contain ExportOperation class.",
+                self,
+            )
+            raise Exception(
+                "ExportOperation class is missed in entry-point file"
+            )
 
     def prepare_bootstrap_dir(self):
         if self.bootstrap_path.exists():

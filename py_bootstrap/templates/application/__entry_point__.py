@@ -1,20 +1,26 @@
-__all__ = ("BuildOperation",)
+__all__ = (
+    "BuildOperation",
+    "ExportOperation",
+)
 
 import logging
 import typing as t
 
-from py_bootstrap.operations import BaseBuildBootstrapOperation
+from py_bootstrap.operations import (
+    BaseBuildBootstrapOperation,
+    BaseExportBootstrapOperation,
+)
 
 if t.TYPE_CHECKING:
     from argparse import ArgumentParser
 
 logger = logging.getLogger(__name__)
 
-DESCRIPTION = "Generates a skeleton of a Python Application"
+DESCRIPTION = "Provides bootstrapping for Python Applications"
 
 
 class BuildOperation(BaseBuildBootstrapOperation):
-    cli_description = DESCRIPTION
+    cli_description = "Generates a skeleton of a Python Application"
     cli_argument_name_help = "The name of the application"
     entry_point_path = __file__
 
@@ -36,3 +42,8 @@ class BuildOperation(BaseBuildBootstrapOperation):
         context["repo"] = self.cli_namespace.repo
 
         return context
+
+
+class ExportOperation(BaseExportBootstrapOperation):
+    cli_description = "Exports a Python Application bootstrap template"
+    entry_point_path = __file__
