@@ -16,12 +16,13 @@ if t.TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-DESCRIPTION = "Provides bootstrapping for Python Packages"
+DESCRIPTION = "Provides operations for Python Packages"
 
 
 class BuildOperation(BaseBuildBootstrapOperation):
-    cli_description = "Generates a skeleton of a Python Package"
-    cli_argument_name_help = "The name of the package"
+    cli_description = "Generates a skeleton of a new Python Package"
+    cli_argument_name_help = "Specifies name of the package"
+    cli_argument_description_help = "Specifies description of the package"
     entry_point_path = __file__
 
     @classmethod
@@ -60,5 +61,5 @@ class BuildOperation(BaseBuildBootstrapOperation):
 
 
 class ExportOperation(BaseExportBootstrapOperation):
-    cli_description = "Exports a Python Package bootstrap template"
+    cli_description = "Exports a Python Package's template files"
     entry_point_path = __file__

@@ -4,5 +4,4 @@ flake8
 flake8-pyproject
 isort
 mypy
-sphinx
 tox

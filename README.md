@@ -1,32 +1,296 @@
-# Bootstrap
-The repo contains several useful skeletons for quick starting new Python projects
+# Bootstrapping of Python projects
+Provides functionality for generating skeletons for Python projects.
+
+# For Consumers
+
+## Installation
+Create and activate a virtual environment if missed:
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+```
+
+Install the package:
+```bash
+pip install -i https://test.pypi.org/simple/ ak-py-bootstrap
+```
+During installing the package creates an entry-point `bootstrap`.
+
+## Using
+
+### Getting help
+Call the tool with `-h`/`-help` argument:
+```bash
+bootstrap --help
+```
+It shows the following text:
+```bash
+usage: bootstrap [-h] {list,build,export,register} ...
+...
+Bootstraps management operations:
+  {list,build,export,register}
+    list                Finds and prints the list of available bootstraps with brief description.
+    build               Generates a skeleton of something from given bootstrap.
+    export              Exports a bootstrap by given name.
+    register            Registers a new bootstrap.
+```
+
+### Getting a list of enabled / registered bootstraps
+Call the following command:
+```bash
+bootstrap list
+```
+It should show something like:
+```bash
+...
+application: Provides bootstrapping for Python Applications
+package: Provides bootstrapping for Python Packages
+...
+```
+Both of these subcommands provide a minimal skeleton of Python Project based on `black`, `isort`, `flake`, `mypy` and `tox` automation tool.
+
+`Application` is a "final" project in `bootstrap` terms.
+
+`Package` is an "intermediate" project in `bootstrap` terms.
+
+The difference between them is the following: no need to build some package(s) from `applications` but it's important to do for `packages`.
+So, `tox` tool provides for `applications` a minimal set of predefined `commands`:
+- reformatting using `black` and `isort` tools.
+- check code style using `black` and `flake` tools.
+- check annotations using `mypy tool`.
+- running tests based on `unittests` framework and calculating a level of coverage using `coverage` tool.
 
 
-## Package skeleton
-The skeleton provides the smallest configuration for Python packages.
-It contains:
-- `<bootstrap-dir>` directory. It's a python package. It contains package info and `tests` subdirectory.
-- `docs` directory. It contains skeletons for generating project documentation.
-- `CHANGELOG.md` file with versioning info.
-- `README.md` file with project description.
-- `pyproject.toml` file with configuration for `black`, `isort`, `flake`, `mypy`, `coverage` and `tox` tools.
-- `requirements.txt` file with a list of Python dependencies.
-- `requirements-dev.txt` file for automation dependencies.
-- `.pre-commit-config.yaml` file with configuration for `pre-commit` tool.
+`tox` tool provides several additional `commands` for `packages:
+- generating documentation based on `sphinx` framework.
+- building versions of packages.
+- publishing prepared archives in PyPI or Test PyPI.
 
-### How to use
-1. Copy-paste the directory.
-2. Make global substitution the following placeholders:
-    - `<bootstrap-name>`. Package technical name.
-    - `<bootstrap-dir>`. **Required**. Directory name where your code is located.
-    - `<bootstrap-python-minor>`. **Required**. It's a number. `12` for instance. Major version is `3`.
-    - `<bootstrap-title>`. Package human-readable name.
-    - `<bootstrap-description>`. Package description.
-    - `<bootstrap-author>`. Package author first and last names.
-    - `<bootstrap-author-email>`. Package autor email.
-    - `<bootstrap-year>`. Current date in the following format: `YYYY-MM-DD`.
-    - `<bootstrap-version-date>`. Current date in the following format: `YYYY-MM-DD`.
-    - `<bootstrap-repo>`. A path to agit repository for cloning.
+You can prepare and register your own bootstraps for speeding up your work.
+See topics below how to do it.
 
-Required placeholders are important for automation.
-Optional placeholders just provide some level of beauty.
+### Generating a skeleton of something
+The main feature of the tool.
+
+First of all, let's show on the help text of `build` command:
+```bash
+bootstrap build --help
+```
+You should see something like:
+```bash
+usage: bootstrap build [-h] [--dest DESTINATION_DIR] {application,package} ...
+...
+options:
+  ...
+  --dest DESTINATION_DIR
+                        Specifies the destination directory for generating. Current directory by default.
+Found bootstraps:
+  {application,package}
+    application         Generates a skeleton of a Python Application
+    package             Generates a skeleton of a Python Package
+```
+The important here is the following:
+- `--dest` argument. It's a common argument for all bootstraps. It specifies a target directory on a file system. Current directory by default.
+
+#### Getting help for every bootstrap
+Every bootstrap can provide own CLI interface.
+So, it's important to examine them before using.
+
+Call the following command:
+```bash
+bootstrap build application --help
+```
+It should render something like:
+```bash
+usage: bootstrap build application [-h] --name NAME --description DESCRIPTION [--repo REPO]
+...
+options:
+  ...
+  --name NAME           Specifies name of the application
+  --description DESCRIPTIORepositoryN
+                        Specifies description of the application.
+```
+As you can see, the required arguments are:
+- `name`. it specifies a name of the application. It should be python-compatible.
+- `description`. it specifies a brief description of a generated application.
+
+#### Generating a skeleton of a python application
+After working with help text, we are ready to generate something.
+Call the following command:
+```bash
+bootstrap build application --name=demo-app --description="The Demo python Application"
+```
+Check the file system:
+```bash
+tree -L2
+```
+You should see something like:
+```bash
+├── CHANGELOG.md
+├── demo_app
+│   └── __init__.py
+├── docs
+│   ├── conf.py
+│   ├── index.rst
+│   ├── __init__.py
+│   ├── make.bat
+│   └── Makefile
+├── pyproject.toml
+├── README.md
+├── requirements-dev.txt
+├── requirements.txt
+└── tests
+    ├── __init__.py
+    └── test_app.py
+```
+So, you have got:
+- prepared `pyproject.toml` file with minimal configuration for the mentioned above tools.
+- minimal `README.md` file.
+- `demo_app` directory where you will place code of your application in the future.
+- `tests` directory where you will place future unit tests for testing you application.
+
+Congratulations! Now you are ready to make the first commit in your new application.
+
+Generating a skeleton of python package is similar.
+
+### Preparing your own bootstraps
+Bootstrap is a directory of the following structure:
+- `__entry_point__.py` file. It's an entry point into every bootstrap. It provides logic for generating bootstraps.
+- any set of any files or directories that provide content for the bootstrap.
+
+There are two ways how to prepare a new custom bootstrap:
+- from scratches.
+- based on existed one.
+
+#### Preparing new bootstrap from scratches
+Working with `bootstrap list` command you can mention that exist one more bootstrap: `boostrap`.
+Yes, this bootstrap provides generating new ... bootstraps.
+
+Call the following command:
+```bash
+bootstrap build --dest=demo-bootstrap bootstrap --name=demo-bs --description="The Demo bootstrap"
+```
+Examine a local file system:
+```bash
+tree -L2 demo-bootstrap/
+```
+You should see something like:
+```bash
+demo-bootstrap/
+├── demo-file.txt.tmpl
+└── __entry_point__.py
+
+1 directory, 2 files
+```
+
+It's a skeleton of new bootstrap.
+Now it's able to prepare any static files or templates for generating a dynamic content for the bootstrap.
+In `demo-file.txt.tmpl` you can find placeholders that the tool provides by default.
+
+#### Export existed bootstrap
+Instead developing bootstraps from scratches, it's able to export one of existed bootstraps and modify it.
+
+Call the following command:
+```bash
+bootstrap export --dest=bs-application-copy application
+```
+In `bs-application-copy` you can find:
+- original `__entry_point__.py` file.
+- a set of static files and templates that provide content of `application` bootstrap.
+
+Please examine these files. That's the best way to understand bootstrapping functionality in details.
+
+Now it's able to modify a cloned bootstrap files for reaching your aims.
+
+### Register new bootstraps
+After developing new bootstrap but before using need to register this one in the tool.
+`register` command is responsible to do it.
+
+Call the following command for getting help text:
+```bash
+bootstrap register --help
+```
+You can see something like:
+```bash
+usage: bootstrap register [-h] --name BOOTSTRAP_NAME --source SOURCE_PATH [-y]
+...
+options:
+  --name BOOTSTRAP_NAME
+                        Specifies name of registered bootstrap template.
+  --source SOURCE_PATH  Specifies the source directory with metadata and bootstrap templates. Current directory by default.
+  -y, --yes-upload      Do not prompt for confirmation.
+```
+The required arguments are:
+- `--name`. It specifies the name of new bootstrap in the tool.
+- `--source`. It specifies a directory with implemented bootstrap.
+- `-y` / `--yes-upload`. The argument disables interactive mode. A system won't print a confirmation prompt with waiting an input from a developer.
+
+So, let's register a prepared new bootstrap:
+```bash
+bootstrap register --name=demo --source=demo-bootstrap
+```
+Confirm uploading by typing `y`.
+
+Check registering by calling `bootstrap list`. It should show new `demo` bootstrap in a list of enabled.
+
+That's all. Now it's able to use a registered bootstrap in your work.
+
+NB: the system is very straightforward, it doesn't make any conclusions instead you. The system allows overriding bootstraps. 
+That's pros and cons at the same time.
+From one hand, it's very easy to test new bootstraps, just fix templates, upload changes and check a result of generating immediately.
+From another hand, it's easy to break a current bootstrap in case you make a decision to REPLACE existed one.
+So, it's a developer's duty to care about what exactly they register.
+
+## For developers
+
+### Cloning the project
+Run the following commands:
+```bash
+git clone https://github.com/ABKorotky/py-bootstrap.git
+cd py_bootstrap
+```
+
+### Prepare a virtual environment for developing
+Run the following commands:
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+```
+
+### Using tox tool in development
+The package provides a prepared `tox` tool that provides the following commands:
+- `cs`. Code style. Checks project's code style using `black` and `flake8` tools.
+- `ann`. Annotation. Checks types annotations in the project using `mypy` tool.
+- `utc`. Unit test with coverage. Runs project's unit tests and calculates a level of coverage.
+- `format`. Formatting. Reformats code in the project using `black` and `isort` tools.
+- `doc`. Documentation. Generates project's documentation using `sphinx` tool.
+- `build`. Builds an archive for distributing the project via PyPI.
+- `upload`. Uploads a prepared distribution archive into one of PyPI (main or test). Uses Test PyPI by default.
+
+### Development agreements
+Need to follow Python's principles during developing and maintaining the project:
+- simple is better than complex.
+- explicit is better than implicit.
+
+and so on...
+
+#### SOLID
+Please, try to follow the `SOLID` principles in development.
+
+#### Branching model
+Development in the project is based on `GitHub` branching model: `master` with feature branches.
+
+`main` branch is the default stable branch.
+
+`<feature>` are default branches for development all. Merging strategy is `--ff-only`. I'm for simple and clear commits tree.
+
+Every distributio is prepared from `<major>.<minor>.<patch>` tags only.
+
+`<major>.<minor>.0` tag is created on commits in `main` branch.
+
+`release/<major>.<minor>` branches can be created on demand from one of `<major>.<minor>.0` tag. Maintaining several versions is in the corresponding release branches.
+
+Fixes in different versions are delivered via `cherry-pick` mechanism. No merge-commits.

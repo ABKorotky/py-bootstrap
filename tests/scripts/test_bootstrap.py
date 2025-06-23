@@ -84,7 +84,8 @@ class MainTestCase(TestCase):
 
         output = mock_stdout.getvalue()
         """
-        usage: bootstrap build [-h] [--dest DESTINATION_DIR] {application,package} ...
+        usage: bootstrap build [-h] [--dest DESTINATION_DIR]
+                       {bootstrap,application,package} ...
         Generates a skeleton of something from given bootstrap.
         options:
           -h, --help            show this help message and exit
@@ -92,9 +93,10 @@ class MainTestCase(TestCase):
                                 Specifies the destination directory for generating.
                                 Current directory by default.
         Found bootstraps:
-          {application,package}
-            application         Generates a skeleton of a Python Application
-            package             Generates a skeleton of Python Package
+          {bootstrap,application,package}
+            bootstrap           Generates a skeleton of a new Bootstrap
+            application         Generates a skeleton of a new Python Application
+            package             Generates a skeleton of a new Python Package
         """
         assert "usage: bootstrap build [-h]" in output
         assert (
@@ -102,7 +104,7 @@ class MainTestCase(TestCase):
         )
         assert "--dest DESTINATION_DIR" in output
         assert "Found bootstraps" in output
-        assert "{application,package}" in output
+        assert "{bootstrap,application,package}" in output
 
     def test_build_bootstrap_application_help(self):
         mock_stdout = io.StringIO()
@@ -116,19 +118,17 @@ class MainTestCase(TestCase):
         """
         usage: bootstrap build application [-h] --name NAME --description DESCRIPTION
                                    [--repo REPO]
-        Generates a skeleton of a Python Application
+        Generates a skeleton of a new Python Application
         options:
           -h, --help            show this help message and exit
           --name NAME           The name of the application
           --description DESCRIPTION
                                 Description of the application.
-          --repo REPO           Repository URL for the application.
         """
         assert "usage: bootstrap build application [-h]" in output
-        assert "Generates a skeleton of a Python Application" in output
+        assert "Generates a skeleton of a new Python Application" in output
         assert "--name NAME" in output
         assert "--description DESCRIPTION" in output
-        assert "--repo REPO" in output
 
     def test_build_bootstrap_application(self):
         destination_path = "tst-application-destination"
@@ -142,7 +142,6 @@ class MainTestCase(TestCase):
                         "application",
                         "--name=test-app",
                         "--description=Test application description",
-                        "--repo=https://localhost/test-app/",
                     ]
                 )
 
@@ -202,6 +201,59 @@ class MainTestCase(TestCase):
         finally:
             shutil.rmtree(os.path.join(os.getcwd(), destination_path))
 
+    def test_build_bootstrap_bootstrap_help(self):
+        mock_stdout = io.StringIO()
+        with (
+            self.assertRaises(SystemExit),
+            contextlib.redirect_stdout(mock_stdout),
+        ):
+            main(cli_args=["build", "bootstrap", "--help"])
+
+        output = mock_stdout.getvalue()
+        """
+        usage: bootstrap build bootstrap [-h] --name NAME --description DESCRIPTION
+        Generates a skeleton of a new Bootstrap
+        options:
+          -h, --help            show this help message and exit
+          --name NAME           Specifies name of the bootstrap
+          --description DESCRIPTION
+                                Specifies description of the bootstrap
+        """
+        assert "usage: bootstrap build bootstrap [-h]" in output
+        assert "Generates a skeleton of a new Bootstrap" in output
+        assert "--name NAME" in output
+        assert "--description DESCRIPTION" in output
+
+    def test_build_bootstrap_bootstrap(self):
+        destination_path = "tst-application-destination"
+        try:
+            mock_stdout = io.StringIO()
+            with contextlib.redirect_stdout(mock_stdout):
+                main(
+                    cli_args=[
+                        "build",
+                        f"--dest={destination_path}",
+                        "bootstrap",
+                        "--name=test-bs",
+                        "--description=Test bootstrap description",
+                    ]
+                )
+
+            output = mock_stdout.getvalue()
+            assert not output
+
+            assert os.path.exists(destination_path)
+
+            assert os.path.exists(
+                os.path.join(destination_path, "__entry_point__.py")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "demo-file.txt.tmpl")
+            )
+
+        finally:
+            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+
     def test_build_bootstrap_package_help(self):
         mock_stdout = io.StringIO()
         with (
@@ -215,7 +267,7 @@ class MainTestCase(TestCase):
         usage: bootstrap build package [-h] --name NAME --description DESCRIPTION
                                --author AUTHOR --author-email AUTHOR_EMAIL
                                [--repo REPO]
-        Generates a skeleton of a Python Package
+        Generates a skeleton of a new Python Package
         options:
           -h, --help            show this help message and exit
           --name NAME           The name of the package
@@ -227,7 +279,7 @@ class MainTestCase(TestCase):
           --repo REPO           Repository URL for the application.
         """
         assert "usage: bootstrap build package [-h]" in output
-        assert "Generates a skeleton of a Python Package" in output
+        assert "Generates a skeleton of a new Python Package" in output
         assert "--name NAME" in output
         assert "--description DESCRIPTION" in output
         assert "--author AUTHOR" in output
@@ -248,7 +300,7 @@ class MainTestCase(TestCase):
                         "--description=Test package description",
                         "--author=Test Author",
                         "--author-email=est.author@mail.loc",
-                        "--repo=https://localhost/test-pkg/",
+                        "--repo=https://localhost/test-pkg",
                     ]
                 )
 
@@ -319,7 +371,7 @@ class MainTestCase(TestCase):
         output = mock_stdout.getvalue()
         """
         usage: bootstrap export [-h] [--dest DESTINATION_DIR]
-                                {application,package} ...
+                        {bootstrap,application,package} ...
         Exports a bootstrap by given name.
         options:
           -h, --help            show this help message and exit
@@ -327,15 +379,16 @@ class MainTestCase(TestCase):
                                 Specifies the destination directory for exporting.
                                 Current directory by default.
         Found bootstraps:
-          {application,package}
-            application         Exports a Python Application bootstrap template
-            package             Exports a Python Package bootstrap template
+          {bootstrap,application,package}
+            bootstrap           Exports a Bootstrap's template files
+            application         Exports a Python Application's template files
+            package             Exports a Python Package's template files
         """
         assert "usage: bootstrap export [-h]" in output
         assert "Exports a bootstrap by given name" in output
         assert "--dest DESTINATION_DIR" in output
         assert "Found bootstraps" in output
-        assert "{application,package}" in output
+        assert "{bootstrap,application,package}" in output
 
     def test_export_bootstrap_application_help(self):
         mock_stdout = io.StringIO()
@@ -348,12 +401,12 @@ class MainTestCase(TestCase):
         output = mock_stdout.getvalue()
         """
         usage: bootstrap export application [-h]
-        Exports a Python Application bootstrap template
+        Exports a Python Application's template files
         options:
           -h, --help  show this help message and exit
         """
         assert "usage: bootstrap export application [-h]" in output
-        assert "Exports a Python Application bootstrap template" in output
+        assert "Exports a Python Application's template files" in output
 
     def test_export_bootstrap_application(self):
         destination_path = "tst-application-destination"
@@ -432,6 +485,55 @@ class MainTestCase(TestCase):
         finally:
             shutil.rmtree(os.path.join(os.getcwd(), destination_path))
 
+    def test_export_bootstrap_bootstrap_help(self):
+        mock_stdout = io.StringIO()
+        with (
+            self.assertRaises(SystemExit),
+            contextlib.redirect_stdout(mock_stdout),
+        ):
+            main(cli_args=["export", "bootstrap", "--help"])
+
+        output = mock_stdout.getvalue()
+        """
+        usage: bootstrap export bootstrap [-h]
+        Exports a Bootstrap's template files
+        options:
+          -h, --help  show this help message and exit
+        """
+        assert "usage: bootstrap export bootstrap [-h]" in output
+        assert "Exports a Bootstrap's template files" in output
+
+    def test_export_bootstrap_bootstrap(self):
+        destination_path = "tst-application-destination"
+        try:
+            mock_stdout = io.StringIO()
+            with contextlib.redirect_stdout(mock_stdout):
+                main(
+                    cli_args=[
+                        "export",
+                        f"--dest={destination_path}",
+                        "bootstrap",
+                    ]
+                )
+
+            output = mock_stdout.getvalue()
+            assert not output
+
+            assert os.path.exists(destination_path)
+
+            assert os.path.exists(
+                os.path.join(destination_path, "__entry_point__.py")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "__entry_point__.py.tmpl")
+            )
+            assert os.path.isfile(
+                os.path.join(destination_path, "demo-file.txt.tmpl.tmpl")
+            )
+
+        finally:
+            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+
     def test_export_bootstrap_package_help(self):
         mock_stdout = io.StringIO()
         with (
@@ -443,12 +545,12 @@ class MainTestCase(TestCase):
         output = mock_stdout.getvalue()
         """
         usage: bootstrap export package [-h]
-        Exports a Python Package bootstrap template
+        Exports a Python Package's template files
         options:
           -h, --help  show this help message and exit
         """
         assert "usage: bootstrap export package [-h]" in output
-        assert "Exports a Python Package bootstrap template" in output
+        assert "Exports a Python Package's template files" in output
 
     def test_export_bootstrap_package(self):
         destination_path = "tst-package-destination"

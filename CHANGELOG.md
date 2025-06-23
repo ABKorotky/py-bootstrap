@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.0] - 2025-06-23
+## [0.6.0] - 2025-06-24
 ### Added
+- Actualize `README.md` file. Prepare `Using` and `For Development` sections.
+- Refactor implemented bootstraps for unification, fix small bugs and actualize help data. See `py_bootstrap/templates` directory for details.
+- Implement `bootstrap` template for developing bootstraps from scratches. See `py_bootstrap/templates/bootstrap/` directory for details.
 - Implement exporting bootstraps templates operation. See `py_bootstrap/operations/export_bootstrap.py` file for details.
 
 ## [0.5.0] - 2025-06-23

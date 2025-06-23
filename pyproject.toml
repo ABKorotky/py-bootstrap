@@ -1,6 +1,6 @@
 [project]
 name = "ak-py-bootstrap"
-description = "Provides functionality for bootstrapping Python projects."
+description = "Provides functionality for generating skeletons for Python projects."
 readme = "README.md"
 requires-python = ">=3.13"
 license = "Apache-2.0"
@@ -8,16 +8,16 @@ license-files = ["LICEN[CS]E*", "AUTHORS.md"]
 authors = [{name = "Aliaksandr Karotki", email = "abkorotky@gmail.com"}]
 keywords = ["bootstrap", "python", "project", "template"]
 classifiers = [
-    "Development Status :: 1 - Planning",
-    "Environment :: Other Environment",
-    "Framework :: AsyncIO",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Framework :: tox",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: POSIX",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.13",
-    "Topic :: Internet",
+    "Topic :: Utilities",
 ]
 dynamic = ["version", "dependencies"]
 
@@ -28,7 +28,6 @@ changelog = "https://github.com/ABKorotky/py-bootstrap/blob/main/CHANGELOG.md"
 [build-system]
 requires = [
     "setuptools",
-    "wheel"
 ]
 build-backend = "setuptools.build_meta"
 

@@ -13,19 +13,11 @@ source .venv/bin/activate
 
 ## For Developers
 
-### Cloning the project
-
-Execute the following commands:
-```bash
-git clone {repo}
-cd {name}
-```
-
 ### Prepare a virtual environment
 
 Execute the following commands:
 ```bash
-python3.{python_minor} -m venv .venv
+python{python_major}.{python_minor} -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install -r requirements-dev.txt

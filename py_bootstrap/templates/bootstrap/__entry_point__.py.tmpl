@@ -1,0 +1,58 @@
+__all__ = (
+    "BuildOperation",
+    "ExportOperation",
+)
+
+from argparse import ArgumentTypeError
+import logging
+import typing as t
+
+from py_bootstrap.operations import (
+    BaseBuildBootstrapOperation,
+    BaseExportBootstrapOperation,
+)
+
+if t.TYPE_CHECKING:
+    from argparse import ArgumentParser
+
+logger = logging.getLogger(__name__)
+
+DESCRIPTION = "Provides bootstrapping for ..."
+
+
+class BuildOperation(BaseBuildBootstrapOperation):
+    cli_description = "Generates a skeleton of a ..."
+    cli_argument_name_help = "Specifies name of the ..."
+    cli_argument_description_help = "Specifies description of the ..."
+    entry_point_path = __file__
+
+    @classmethod
+    def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""):
+        super().prepare_cli_parser(parser, prefix)
+        # TODO. Define here CLI arguments for the bootstrap
+        parser.add_argument(
+            "--demo",
+            dest="demo",
+            type=cls.validate_cli_argument_demo,
+            help="Specifies demo value. Minimal length is 3.",
+        )
+
+    @classmethod
+    def validate_cli_argument_demo(cls, value: str):
+        # TODO. define here a required validation for the argument
+        if len(value) < 3:
+            raise ArgumentTypeError("Invalid value for 'demo' received")
+        return value
+
+    def build_context(self) -> dict[str, str]:
+        context = super().build_context()
+
+        # TODO. Fill context here from CLI or something computed.
+        context["demo"] = self.cli_namespace.demo
+
+        return context
+
+
+class ExportOperation(BaseExportBootstrapOperation):
+    cli_description = "Exports a ... template files"
+    entry_point_path = __file__

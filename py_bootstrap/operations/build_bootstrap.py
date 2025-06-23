@@ -90,6 +90,7 @@ class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):
 class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
     entry_point_path: t.ClassVar[str]
     cli_argument_name_help: t.ClassVar[str]
+    cli_argument_description_help: t.ClassVar[str]
 
     _context: dict[str, str]
 
@@ -107,7 +108,7 @@ class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
             dest="description",
             type=str,
             required=True,
-            help="Description of the application.",
+            help=cls.cli_argument_description_help,
         )
 
     @classmethod

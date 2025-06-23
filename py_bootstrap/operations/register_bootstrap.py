@@ -36,7 +36,7 @@ class RegisterBootstrapOperation(BaseBootstrapsOperation):
             type=cls.validate_cli_argument_source_path,
             required=True,
             help=(
-                "Specifies the source directory with metadata and bootstrap templates."
+                "Specifies a directory with entry-point and other bootstrap files."
                 " Current directory by default."
             ),
         )

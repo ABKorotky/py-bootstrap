@@ -17,7 +17,7 @@ source .venv/bin/activate
 
 Execute the following commands:
 ```bash
-git clone {repo}
+git clone {repo}.git
 cd {name}
 ```
 
@@ -25,7 +25,7 @@ cd {name}
 
 Execute the following commands:
 ```bash
-python3.{python_minor} -m venv .venv
+python{python_major}.{python_minor} -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
