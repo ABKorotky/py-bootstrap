@@ -168,23 +168,6 @@ class MainTestCase(TestCase):
                 os.path.join(destination_path, "requirements-dev.txt")
             )
 
-            assert os.path.isdir(os.path.join(destination_path, "docs"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "__init__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "conf.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "index.rst")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "make.bat")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "Makefile")
-            )
-
             assert os.path.isdir(os.path.join(destination_path, "test_app"))
             assert os.path.isfile(
                 os.path.join(destination_path, "test_app", "__init__.py")
@@ -446,23 +429,6 @@ class MainTestCase(TestCase):
             )
             assert os.path.isfile(
                 os.path.join(destination_path, "requirements-dev.txt")
-            )
-
-            assert os.path.isdir(os.path.join(destination_path, "docs"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "__init__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "conf.py.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "index.rst.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "make.bat")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "Makefile")
             )
 
             assert os.path.isdir(

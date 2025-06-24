@@ -261,36 +261,58 @@ pip install -r requirements-dev.txt
 ```
 
 ### Using tox tool in development
-The package provides a prepared `tox` tool that provides the following commands:
-- `cs`. Code style. Checks project's code style using `black` and `flake8` tools.
+The package provides the following ['tox' tooling](https://tox.wiki/en/latest/):
+- `cs`. Code Style. Checks project's code style using `black` and `flake8` tools.
 - `ann`. Annotation. Checks types annotations in the project using `mypy` tool.
-- `utc`. Unit test with coverage. Runs project's unit tests and calculates a level of coverage.
+- `utc`. Unit Tests with Coverage. Runs project's unit tests and calculates a level of coverage.
 - `format`. Formatting. Reformats code in the project using `black` and `isort` tools.
 - `doc`. Documentation. Generates project's documentation using `sphinx` tool.
 - `build`. Builds an archive for distributing the project via PyPI.
 - `upload`. Uploads a prepared distribution archive into one of PyPI (main or test). Uses Test PyPI by default.
 
-### Development agreements
-Need to follow Python's principles during developing and maintaining the project:
-- simple is better than complex.
-- explicit is better than implicit.
+Run `tox l` command for details.
 
-and so on...
+### Development rules and agreements
+Follow Python's principles [PEP 20 – The Zen of Python](https://peps.python.org/pep-0020/):
+- Simple is better than complex.
+- Explicit is better than implicit. And so on...
 
-#### SOLID
-Please, try to follow the `SOLID` principles in development.
+Follow ["SOLID"](https://en.wikipedia.org/wiki/SOLID) principles:
+- Single responsibility principle.
+- Open–closed principle.
+- Liskov substitution principle.
+- Interface segregation principle.
+- Dependency inversion principle.
 
-#### Branching model
-Development in the project is based on `GitHub` branching model: `master` with feature branches.
+### Branching model
+Based on "GitHub-Flow". Extends by release branches on demand. Rules:
+- `main` branch is default stable branch. It uses for releasing new stable distributions.
+- Use different `<feature>` branches for developing. Count of commits in feature branches and them messages are not limited.
+- Code in "feature" branches should be prepared and tested properly before merging. Running `tox` should pass successfully.
+- Merging branches is enabled in the same branch from it was born. Squash commits before merging. Make rebasing on target branch, merge with `--ff-only` strategy.
+- Merging code in `main` branch is an intention to release it. So, almost all commits in `main` branch should be tagged.
+- Follow [PEP 440](https://peps.python.org/pep-0440/) principles for tagging commits.
+- Tags in `<major>.<minor>.<patch>` in `main` branch are placeholders for creating corresponded release branches.
+- Use release branches for maintaining several versions at the same time. Format of release branches is `release/<major>.<minor>`.
+- Tags on `main` branch should increase monotonic. It's forbidden to create tags in sequence like: `0.2.0` -> `0.2.1` -> `0.3.0` -> `0.3.1` -> `0.2.2`. Start a release branch `release/0.2` from tag `0.2.1` and implement required logic. Mark the commit in the release branch as `0.2.2` and release it.
+- Use `cherry-pick` mechanisms for transferring changes between `main` branch and supported release branches. So, make `cherry-pick` of `0.2.2` commit from `release/0.2` branch into `main` and deliver it as `0.3.2` for instance.
 
-`main` branch is the default stable branch.
+Recap: Every time commits structure in the project should look as a tree.
 
-`<feature>` are default branches for development all. Merging strategy is `--ff-only`. I'm for simple and clear commits tree.
+### Releasing new distributions flow
+1. Create a `feature` branch from `main` or release one.
+2. Make corresponding changes. Don't be afraid to run `tox -e format` and `tox` sometimes during development.
+3. Run `tox -e doc`.
+4. Examine generated documentation.
+5. Squash all commits into one and rebase your changes on the actual state of the target branch.
+6. Write what you have done in `CHANGELOG.md` file into the corresponding section. Don't forget to actualize the `VERSION` of these changes in `py_bootstrap/__init__.py` file.
+7. Examine diff before merging, clean it from accidentally committed garbage.
+8. Run `tox -e format` on ready for merging commit. 
+9. Run `tox` of ready for merging commit. Ensure that the command passed successfully.
+10. Merge your `feature` branch into target one: `main` or one of `release`.
+11. Mark the commit by tag according to the version from `CHANGELOG.md` file.
+12. Prepare a distribution from the tag. Run `tox -e build`. Make final checks with generated archive. Ensure it is installed properly.
+13. Publish the archive in Test PyPI. Run `tox -e upload -- dist/ak_py_bootstrap-<version>.tar.gz`. Ensure that the distribution is installed properly from Test PyPI. Prepare a temporary environment and run `pip install --extra-index-url=https://test.pypi.org/simple/ ak-py-bootstrap`.
+14. Publish the archive in main PyPI. Run `export PYPI_REPOSITORY_ALIAS=pypi` for switching uploading to main PyPI and repeat uploading via `tox -e upload -- ...`. Ensure that the distribution is installed properly from PyPI. Prepare a temporary environment and run `pip install ak-py-bootstrap`.
 
-Every distributio is prepared from `<major>.<minor>.<patch>` tags only.
-
-`<major>.<minor>.0` tag is created on commits in `main` branch.
-
-`release/<major>.<minor>` branches can be created on demand from one of `<major>.<minor>.0` tag. Maintaining several versions is in the corresponding release branches.
-
-Fixes in different versions are delivered via `cherry-pick` mechanism. No merge-commits.
+Use this flow for releasing distributions from release branches.

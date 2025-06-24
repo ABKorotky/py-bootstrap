@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### [0.6.1] - 2025-06-24
+### Changed
+- Refactor `README.md` files in `application`, `package`. See `py_bootastrap/templates/` directory for details.
+- Refactor project's `README.md` file. See `README.md` for details.
+
 ## [0.6.0] - 2025-06-24
 ### Added
 - Actualize `README.md` file. Prepare `Using` and `For Development` sections.

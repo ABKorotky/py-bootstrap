@@ -95,13 +95,3 @@ commands = [
     ["coverage", "report"],
     ["coverage", "html"],
 ]
-
-[tool.tox.env.doc]
-description = "Generates documentation using sphinx tool"
-deps = ["--requirement={{toxinidir}}/requirements.txt", "sphinx"]
-allowlist_externals = ["rm"]
-commands = [
-    ["rm", "-rf", "docs/modules"],
-    ["sphinx-apidoc", "--separate", "--no-toc", "--no-headings", "--module-first", "--output-dir=docs/modules", "--ext-viewcode", "{underscored_name}"],
-    ["sphinx-build", "-b", "html", "docs", "docs/build", "-v"],
-]

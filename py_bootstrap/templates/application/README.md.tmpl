@@ -2,23 +2,51 @@
 
 {description}.
 
-## For Consumers
-
-### Installation
-
-```bash
-python{python_major}.{python_minor} -m venv .venv
-source .venv/bin/activate
-```
-
 ## For Developers
+Let's consider that we have already cloned the repository.
 
 ### Prepare a virtual environment
 
-Execute the following commands:
+Run the following commands:
 ```bash
 python{python_major}.{python_minor} -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
+
+### Tox functionality
+The application provides the following ['tox' tooling](https://tox.wiki/en/latest/):
+- `cs`. Code Style. Checks project's code style using `black` and `flake8` tools.
+- `ann`. Annotation. Checks types annotations in the project using `mypy` tool.
+- `utc`. Unit Tests with Coverage. Runs project's unit tests and calculates a level of coverage.
+- `format`. Formatting. Reformats code in the project using `black` and `isort` tools.
+
+Run `tox l` command for details.
+
+### Development rules and agreements
+Follow Python's principles [PEP 20 – The Zen of Python](https://peps.python.org/pep-0020/):
+- Simple is better than complex.
+- Explicit is better than implicit. And so on...
+
+Follow ["SOLID"](https://en.wikipedia.org/wiki/SOLID) principles:
+- Single responsibility principle.
+- Open–closed principle.
+- Liskov substitution principle.
+- Interface segregation principle.
+- Dependency inversion principle.
+
+### Branching model
+Based on "GitHub-Flow". Extends by release branches on demand. Rules:
+- `main` branch is default stable branch. It uses for releasing new stable distributions.
+- Use different `<feature>` branches for developing. Count of commits in feature branches and them messages are not limited.
+- Code in "feature" branches should be prepared and tested properly before merging. Running `tox` should pass successfully.
+- Merging branches is enabled in the same branch from it was born. Squash commits before merging. Make rebasing on target branch, merge with `--ff-only` strategy.
+- Merging code in `main` branch is an intention to release it. So, almost all commits in `main` branch should be tagged.
+- Follow [PEP 440](https://peps.python.org/pep-0440/) principles for tagging commits.
+- Tags in `<major>.<minor>.<patch>` in `main` branch are placeholders for creating corresponded release branches.
+- Use release branches for maintaining several versions at the same time. Format of release branches is `release/<major>.<minor>`.
+- Tags on `main` branch should increase monotonic. It's forbidden to create tags in sequence like: `0.2.0` -> `0.2.1` -> `0.3.0` -> `0.3.1` -> `0.2.2`. Start a release branch `release/0.2` from tag `0.2.1` and implement required logic. Mark the commit in the release branch as `0.2.2` and release it.
+- Use `cherry-pick` mechanisms for transferring changes between `main` branch and supported release branches. So, make `cherry-pick` of `0.2.2` commit from `release/0.2` branch into `main` and deliver it as `0.3.2` for instance.
+
+Recap: Every time commits structure in the project should look as a tree.
