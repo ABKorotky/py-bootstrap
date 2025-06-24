@@ -85,7 +85,7 @@ class MainTestCase(TestCase):
         output = mock_stdout.getvalue()
         """
         usage: bootstrap build [-h] [--dest DESTINATION_DIR]
-                       {bootstrap,application,package} ...
+                       {application,package,bootstrap} ...
         Generates a skeleton of something from given bootstrap.
         options:
           -h, --help            show this help message and exit
@@ -93,10 +93,10 @@ class MainTestCase(TestCase):
                                 Specifies the destination directory for generating.
                                 Current directory by default.
         Found bootstraps:
-          {bootstrap,application,package}
-            bootstrap           Generates a skeleton of a new Bootstrap
+          {application,package,bootstrap}
             application         Generates a skeleton of a new Python Application
             package             Generates a skeleton of a new Python Package
+            bootstrap           Generates a skeleton of a new Bootstrap
         """
         assert "usage: bootstrap build [-h]" in output
         assert (
@@ -104,7 +104,7 @@ class MainTestCase(TestCase):
         )
         assert "--dest DESTINATION_DIR" in output
         assert "Found bootstraps" in output
-        assert "{bootstrap,application,package}" in output
+        assert "{application,package,bootstrap}" in output
 
     def test_build_bootstrap_application_help(self):
         mock_stdout = io.StringIO()
@@ -168,17 +168,9 @@ class MainTestCase(TestCase):
                 os.path.join(destination_path, "requirements-dev.txt")
             )
 
-            assert os.path.isdir(os.path.join(destination_path, "test_app"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "test_app", "__init__.py")
-            )
-
             assert os.path.isdir(os.path.join(destination_path, "tests"))
             assert os.path.isfile(
                 os.path.join(destination_path, "tests", "__init__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "tests", "test_app.py")
             )
 
         finally:
@@ -354,7 +346,7 @@ class MainTestCase(TestCase):
         output = mock_stdout.getvalue()
         """
         usage: bootstrap export [-h] [--dest DESTINATION_DIR]
-                        {bootstrap,application,package} ...
+                        {application,package,bootstrap} ...
         Exports a bootstrap by given name.
         options:
           -h, --help            show this help message and exit
@@ -362,16 +354,16 @@ class MainTestCase(TestCase):
                                 Specifies the destination directory for exporting.
                                 Current directory by default.
         Found bootstraps:
-          {bootstrap,application,package}
-            bootstrap           Exports a Bootstrap's template files
+          {application,package,bootstrap}
             application         Exports a Python Application's template files
             package             Exports a Python Package's template files
+            bootstrap           Exports a Bootstrap's template files
         """
         assert "usage: bootstrap export [-h]" in output
         assert "Exports a bootstrap by given name" in output
         assert "--dest DESTINATION_DIR" in output
         assert "Found bootstraps" in output
-        assert "{bootstrap,application,package}" in output
+        assert "{application,package,bootstrap}" in output
 
     def test_export_bootstrap_application_help(self):
         mock_stdout = io.StringIO()
@@ -431,21 +423,9 @@ class MainTestCase(TestCase):
                 os.path.join(destination_path, "requirements-dev.txt")
             )
 
-            assert os.path.isdir(
-                os.path.join(destination_path, "{underscored_name}")
-            )
-            assert os.path.isfile(
-                os.path.join(
-                    destination_path, "{underscored_name}", "__init__.py.tmpl"
-                )
-            )
-
             assert os.path.isdir(os.path.join(destination_path, "tests"))
             assert os.path.isfile(
                 os.path.join(destination_path, "tests", "__init__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "tests", "test_app.py.tmpl")
             )
 
         finally:

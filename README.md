@@ -128,21 +128,12 @@ tree -L2
 You should see something like:
 ```bash
 ├── CHANGELOG.md
-├── demo_app
-│   └── __init__.py
-├── docs
-│   ├── conf.py
-│   ├── index.rst
-│   ├── __init__.py
-│   ├── make.bat
-│   └── Makefile
 ├── pyproject.toml
 ├── README.md
 ├── requirements-dev.txt
 ├── requirements.txt
 └── tests
-    ├── __init__.py
-    └── test_app.py
+    └── __init__.py
 ```
 So, you have got:
 - prepared `pyproject.toml` file with minimal configuration for the mentioned above tools.
@@ -236,11 +227,49 @@ Check registering by calling `bootstrap list`. It should show new `demo` bootstr
 
 That's all. Now it's able to use a registered bootstrap in your work.
 
-NB: the system is very straightforward, it doesn't make any conclusions instead you. The system allows overriding bootstraps. 
+NB: the system is very straightforward, it doesn't make any conclusions instead of you. The system allows overriding bootstraps. 
 That's pros and cons at the same time.
-From one hand, it's very easy to test new bootstraps, just fix templates, upload changes and check a result of generating immediately.
-From another hand, it's easy to break a current bootstrap in case you make a decision to REPLACE existed one.
+On the one hand, it's very easy to test new bootstraps, just fix templates, upload changes and check a result of generating immediately.
+On the other hand, it's easy to break a current bootstrap in case you make a decision to REPLACE existed one.
 So, it's a developer's duty to care about what exactly they register.
+
+### Embed package bootstraps as plugins
+Define in yours `pyproject.toml` file the following section:
+```toml
+[project.entry-points.py_bootstrap_templates]
+<your-package-name> = "<package-root-dir>.py_bootstrap.templates"
+```
+Create the following files structure:
+```bash
+<package-root-dir>
+└── py_bootstrap
+    └── templates
+        ├── <your-bootstrap-dir>
+        │   ├── __entry_point__.py
+        │   ...
+        ├── <your-another-bootstrap-dir>
+        │   ├── __entry_point__.py
+        │   ...
+        └── __init__.py
+```
+Put into `<package-root-dir>/py_bootstraps/templates/__init__.py` file the following content:
+```python
+__all__ = ("ENABLED_TEMPLATES",)
+
+ENABLED_TEMPLATES = [
+    "<your-bootstrap-dir>",
+    "your-another-bootstrap-dir",
+]
+```
+That's all! Build a new version of the package, install it in some virtual environment together with `ak-py-bootstrap` package and enjoy of working with package's bootstraps.
+
+Running `bootstrap list` you will see something like:
+```bash
+...
+your-bootstrap-dir: Your bootstrap description.
+your-another-bootstrap-dir: Your another bootstrap description.
+...
+```
 
 ## For developers
 

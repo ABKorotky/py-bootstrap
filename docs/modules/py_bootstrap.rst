@@ -16,3 +16,4 @@ Subpackages
    py_bootstrap.files_processors
    py_bootstrap.operations
    py_bootstrap.scripts
+   py_bootstrap.templates

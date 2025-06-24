@@ -11,8 +11,8 @@ DESCRIPTION = "Provides functionality for bootstrapping Python projects"
 
 VERSION = (
     0,
-    6,
-    1,
+    7,
+    0,
 )
 PY_VERSION = (
     3,

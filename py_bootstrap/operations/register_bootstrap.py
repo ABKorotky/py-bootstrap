@@ -7,6 +7,7 @@ from argparse import ArgumentTypeError
 from functools import cached_property
 from pathlib import Path
 
+import py_bootstrap.templates as templates_module
 from py_bootstrap.files_processors import CopyFilesProcessor
 
 from .base import BaseBootstrapsOperation
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 class RegisterBootstrapOperation(BaseBootstrapsOperation):
     cli_description = "Registers a new bootstrap."
+    templates_path = Path(templates_module.__file__).parent
 
     @classmethod
     def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""):

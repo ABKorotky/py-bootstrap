@@ -21,6 +21,9 @@ classifiers = [
 ]
 dynamic = ["version", "dependencies"]
 
+[project.entry-points.py_bootstrap_templates]
+py_bootstrap = "py_bootstrap.templates"
+
 [project.urls]
 repository = "https://github.com/ABKorotky/py-bootstrap.git"
 changelog = "https://github.com/ABKorotky/py-bootstrap/blob/main/CHANGELOG.md"
@@ -70,7 +73,7 @@ application-import-names = ["py_bootstrap"]
 
 [tool.mypy]
 check_untyped_defs = true
-exclude = "/(.venv|templates|tst-templates)"
+exclude = "/(.venv|templates|tst_templates)"
 files = "**/*.py"
 follow_imports = "silent"
 ignore_missing_imports = true

@@ -4,30 +4,21 @@ import os
 import shutil
 import typing as t
 from argparse import Namespace
+from pathlib import Path
 from unittest import TestCase
 
-import tests as tst_package
+import tests.tst_templates as tst_templates_module
 from py_bootstrap.operations import BaseExportBootstrapOperation
 
 if t.TYPE_CHECKING:
     ...
 
 
-class TstOperation(BaseExportBootstrapOperation):
-    package = tst_package
-    templates_dir_name = "tst-templates"
-    entry_point_path = os.path.join(
-        os.path.dirname(tst_package.__file__),
-        templates_dir_name,
-        "test_bootstrap",
-        f"{BaseExportBootstrapOperation.entry_point_module_name}.py",
-    )
-
-
 class BaseExportBootstrapOperationTestCase(TestCase):
+    tst_cls = BaseExportBootstrapOperation
+    tst_obj: BaseExportBootstrapOperation
 
-    tst_cls = TstOperation
-    tst_obj: TstOperation
+    templates_path = Path(tst_templates_module.__file__).parent
 
     def setUp(self):
         self.tst_obj = self.tst_cls()
@@ -42,6 +33,9 @@ class BaseExportBootstrapOperationTestCase(TestCase):
             destination_dir="test-destination",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
+        self.tst_obj.set_bootstrap_path(
+            path=self.templates_path / "test_bootstrap"
+        )
 
         mock_stdout = io.StringIO()
         with contextlib.redirect_stdout(mock_stdout):
@@ -81,6 +75,9 @@ class BaseExportBootstrapOperationTestCase(TestCase):
             destination_dir="test-destination",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
+        self.tst_obj.set_bootstrap_path(
+            path=self.templates_path / "test_bootstrap"
+        )
 
         os.makedirs("test-destination/value.d", exist_ok=True)
         os.mknod("test-destination/dir")
@@ -107,6 +104,9 @@ class BaseExportBootstrapOperationTestCase(TestCase):
             destination_dir="test-destination",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
+        self.tst_obj.set_bootstrap_path(
+            path=self.templates_path / "test_bootstrap"
+        )
 
         os.mknod("test-destination")
         with self.assertRaises(Exception) as err_ctx:

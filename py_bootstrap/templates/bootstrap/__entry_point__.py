@@ -23,7 +23,6 @@ class BuildOperation(BaseBuildBootstrapOperation):
     cli_description = "Generates a skeleton of a new Bootstrap"
     cli_argument_name_help = "Specifies name of the bootstrap"
     cli_argument_description_help = "Specifies description of the bootstrap"
-    entry_point_path = __file__
 
     @classmethod
     def prepare_cli_parser(cls, parser: "ArgumentParser", prefix: str = ""):
@@ -36,4 +35,3 @@ class BuildOperation(BaseBuildBootstrapOperation):
 
 class ExportOperation(BaseExportBootstrapOperation):
     cli_description = "Exports a Bootstrap's template files"
-    entry_point_path = __file__

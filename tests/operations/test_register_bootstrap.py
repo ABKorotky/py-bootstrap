@@ -17,14 +17,9 @@ if t.TYPE_CHECKING:
     ...
 
 
-class TstOperation(RegisterBootstrapOperation):
-    package = tst_package
-    templates_dir_name = "tst-templates"
-
-
-class ListBootstrapsOperationTestCase(TestCase):
-    tst_cls = TstOperation
-    tst_obj: TstOperation
+class RegisterBootstrapOperationTestCase(TestCase):
+    tst_cls = RegisterBootstrapOperation
+    tst_obj: RegisterBootstrapOperation
 
     source_path: "Path"
 
@@ -36,7 +31,7 @@ class ListBootstrapsOperationTestCase(TestCase):
         shutil.rmtree(self.tst_obj.bootstrap_path, ignore_errors=True)
 
     def test_run(self):
-        source_path = self.source_path / "tst-templates/test_bootstrap"
+        source_path = self.source_path / "tst_templates/test_bootstrap"
         namespace = Namespace(
             source_path=source_path,
             bootstrap_name="test_bootstrap_copy",
@@ -78,7 +73,7 @@ class ListBootstrapsOperationTestCase(TestCase):
         )
 
     def test_run_override(self):
-        source_path = self.source_path / "tst-templates/test_bootstrap"
+        source_path = self.source_path / "tst_templates/test_bootstrap"
         namespace = Namespace(
             source_path=source_path,
             bootstrap_name="test_bootstrap_copy",
@@ -99,7 +94,7 @@ class ListBootstrapsOperationTestCase(TestCase):
         )
 
     def test_run_interactive_no(self):
-        source_path = self.source_path / "tst-templates/test_bootstrap"
+        source_path = self.source_path / "tst_templates/test_bootstrap"
         namespace = Namespace(
             source_path=source_path,
             bootstrap_name="test_bootstrap_copy",
@@ -121,7 +116,7 @@ class ListBootstrapsOperationTestCase(TestCase):
         assert not os.path.exists(destination_path)
 
     def test_run_wrong_entry_point_file(self):
-        source_path = self.source_path / "tst-templates/test_wrong_entry_point"
+        source_path = self.source_path / "tst_templates/test_wrong_entry_point"
         namespace = Namespace(
             source_path=source_path,
             bootstrap_name="test_bootstrap_copy",
@@ -138,7 +133,7 @@ class ListBootstrapsOperationTestCase(TestCase):
         )
 
     def test_run_missed_entry_point_file(self):
-        source_path = self.source_path / "tst-templates/test_missed_entry_point"
+        source_path = self.source_path / "tst_templates/test_missed_entry_point"
         namespace = Namespace(
             source_path=source_path,
             bootstrap_name="test_bootstrap_copy",

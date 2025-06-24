@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import typing as t
+from argparse import ArgumentTypeError
 from datetime import datetime
 from functools import cached_property
 from pathlib import Path
@@ -58,40 +59,23 @@ class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):
         entry_points_modules_map = dict(self.find_bootstraps())
 
         entry_point_module = entry_points_modules_map[bootstrap_name]
+        assert entry_point_module.__file__
 
-        try:
-            operation: "BaseBuildBootstrapOperation" = (
-                entry_point_module.BuildOperation()
-            )
-        except AttributeError as err:
-            logger.error(
-                "%r. metadata does not contain BuildOperation attribute: %r.",
-                self,
-                entry_point_module,
-            )
-            raise Exception(
-                f"Invalid metadata module for {bootstrap_name}"
-            ) from err
-        except Exception as err:
-            logger.exception(
-                "%r. unable to create operation instance from: %r. error: %r.",
-                self,
-                entry_point_module.Operation,
-                err,
-            )
-            raise Exception(
-                f"BuildOperation creation failed for {bootstrap_name}"
-            ) from err
-
-        operation.set_cli_namespace(self.cli_namespace)
+        operation: "BaseBuildBootstrapOperation" = (
+            entry_point_module.BuildOperation()
+        )
+        operation.set_cli_namespace(namespace=self.cli_namespace)
+        operation.set_bootstrap_path(
+            path=Path(entry_point_module.__file__).parent
+        )
         operation.run()
 
 
 class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
-    entry_point_path: t.ClassVar[str]
     cli_argument_name_help: t.ClassVar[str]
     cli_argument_description_help: t.ClassVar[str]
 
+    _bootstrap_path: "Path"
     _context: dict[str, str]
 
     @classmethod
@@ -113,21 +97,24 @@ class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
 
     @classmethod
     def validate_cli_argument_name(cls, value: str) -> str:
-        if not re.match(r"^[a-z0-9-]+$", value):
-            raise ValueError(
+        if not re.match(r"^[a-z][a-z0-9-]+$", value):
+            raise ArgumentTypeError(
                 "The name can only contain alphanumeric characters and hyphens."
             )
         return value
 
     @cached_property
     def bootstrap_path(self) -> "Path":
-        return Path(self.entry_point_path).parent
+        return self._bootstrap_path
 
     @cached_property
     def destination_path(self) -> "Path":
         if self.cli_namespace.destination_dir:
             return Path(os.getcwd(), self._cli_namespace.destination_dir)
         return Path.cwd()
+
+    def set_bootstrap_path(self, path: "Path"):
+        self._bootstrap_path = path
 
     def run(self):
         self._context = self.build_context()

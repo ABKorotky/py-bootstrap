@@ -4,30 +4,21 @@ import os
 import shutil
 import typing as t
 from argparse import Namespace
+from pathlib import Path
 from unittest import TestCase
 
-import tests as tst_package
+import tests.tst_templates as tst_templates_module
 from py_bootstrap.operations import BaseBuildBootstrapOperation
 
 if t.TYPE_CHECKING:
     ...
 
 
-class TstOperation(BaseBuildBootstrapOperation):
-    package = tst_package
-    templates_dir_name = "tst-templates"
-    entry_point_path = os.path.join(
-        os.path.dirname(tst_package.__file__),
-        templates_dir_name,
-        "test_bootstrap",
-        f"{BaseBuildBootstrapOperation.entry_point_module_name}.py",
-    )
-
-
 class BaseBuildBootstrapOperationTestCase(TestCase):
+    tst_cls = BaseBuildBootstrapOperation
+    tst_obj: BaseBuildBootstrapOperation
 
-    tst_cls = TstOperation
-    tst_obj: TstOperation
+    templates_path = Path(tst_templates_module.__file__).parent
 
     def setUp(self):
         self.tst_obj = self.tst_cls()
@@ -44,6 +35,9 @@ class BaseBuildBootstrapOperationTestCase(TestCase):
             description="Test project description",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
+        self.tst_obj.set_bootstrap_path(
+            path=self.templates_path / "test_bootstrap"
+        )
 
         mock_stdout = io.StringIO()
         with contextlib.redirect_stdout(mock_stdout):
@@ -79,6 +73,9 @@ class BaseBuildBootstrapOperationTestCase(TestCase):
             description="Test project description",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
+        self.tst_obj.set_bootstrap_path(
+            path=self.templates_path / "test_bootstrap"
+        )
 
         os.makedirs("test-destination/value.d", exist_ok=True)
         os.mknod("test-destination/dir")
@@ -107,6 +104,9 @@ class BaseBuildBootstrapOperationTestCase(TestCase):
             description="Test project description",
         )
         self.tst_obj.set_cli_namespace(namespace=namespace)
+        self.tst_obj.set_bootstrap_path(
+            path=self.templates_path / "test_bootstrap"
+        )
 
         os.mknod("test-destination")
         with self.assertRaises(Exception) as err_ctx:
