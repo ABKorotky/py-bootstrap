@@ -125,7 +125,7 @@ class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
         name = self.cli_namespace.name.strip()
         name_parts: list[str] = name.split("-")
 
-        underscored_name = "_".join(name_parts)
+        python_name = "_".join(name_parts)
         upper_name = "_".join(i.upper() for i in name_parts)
         class_name = "".join(i.title() for i in name_parts)
         title = " ".join(i.title() for i in name_parts)
@@ -133,7 +133,7 @@ class BaseBuildBootstrapOperation(BaseBootstrapsOperation):
         now = datetime.now()
         return {
             "name": name,
-            "underscored_name": underscored_name,
+            "python_name": python_name,
             "upper_name": upper_name,
             "class_name": class_name,
             "title": title,

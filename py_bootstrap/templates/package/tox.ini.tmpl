@@ -1,0 +1,81 @@
+[tox]
+envlist =
+    cs
+    ann
+    utc
+
+
+[testenv:format]
+description = "Formats code by black and isort tools"
+deps =
+    black
+    isort
+skip_install = true
+commands =
+    isort {python_name} tests
+    black {python_name} tests
+
+
+[testenv:cs]
+description = "Checks code style by black, isort and flake8 tools"
+deps =
+    black
+    isort
+    flake8
+    flake8-pyproject
+skip_install = true
+commands =
+    isort --check-only --diff {python_name} tests
+    black --check --diff {python_name} tests
+    flake8 {python_name} tests
+
+
+[testenv:ann]
+description = "Checks types annotations by mypy"
+deps = mypy
+skip_install = true
+commands =
+    mypy {python_name} tests
+
+
+[testenv:utc]
+description = "Runs tests under coverage, prints a text report and builds HTML report"
+deps =
+    --requirement={{toxinidir}}/requirements.txt
+    coverage
+commands =
+    coverage run --module unittest discover tests
+    coverage report
+    coverage html
+
+
+[testenv:doc]
+description = "Generates documentation using sphinx tool"
+deps =
+    --requirement={{toxinidir}}/requirements.txt
+    sphinx
+allowlist_externals = rm
+commands =
+    rm -rf docs/modules
+    sphinx-apidoc --separate --no-toc --no-headings --module-first --output-dir=docs/modules --ext-viewcode {python_name}
+    sphinx-build -b html docs docs/build-v
+
+
+[testenv:build]
+description = "Builds PIP package using build tool"
+deps = build
+skip_install = true
+allowlist_externals = rm
+commands =
+    python -m build --sdist
+    rm -rf build
+
+
+[testenv:upload]
+description = "Uploads generated PIP package to PyPI index"
+deps = twine
+skip_install = true
+pass_env =
+    PYPI_REPOSITORY_ALIAS
+commands =
+    twine upload --repository={{env:PYPI_REPOSITORY_ALIAS:testpypi}} --verbose {{posargs}}

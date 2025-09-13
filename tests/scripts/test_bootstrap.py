@@ -1,8 +1,8 @@
 import contextlib
 import io
-import os
 import shutil
 import typing as t
+from pathlib import Path
 from unittest import TestCase
 
 from py_bootstrap.operations.register_bootstrap import (
@@ -15,6 +15,11 @@ if t.TYPE_CHECKING:
 
 
 class MainTestCase(TestCase):
+    destination_dir = "tst-destination-dir"
+
+    def tearDown(self):
+        shutil.rmtree(self.destination_dir, ignore_errors=True)
+
     def test_help(self):
         mock_stdout = io.StringIO()
         with (
@@ -131,50 +136,33 @@ class MainTestCase(TestCase):
         assert "--description DESCRIPTION" in output
 
     def test_build_bootstrap_application(self):
-        destination_path = "tst-application-destination"
-        try:
-            mock_stdout = io.StringIO()
-            with contextlib.redirect_stdout(mock_stdout):
-                main(
-                    cli_args=[
-                        "build",
-                        f"--dest={destination_path}",
-                        "application",
-                        "--name=test-app",
-                        "--description=Test application description",
-                    ]
-                )
-
-            output = mock_stdout.getvalue()
-            assert not output
-
-            assert os.path.exists(destination_path)
-
-            assert not os.path.exists(
-                os.path.join(destination_path, "__entry_point__.py")
-            )
-            assert os.path.isfile(os.path.join(destination_path, ".gitignore"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "CHANGELOG.md")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "pyproject.toml")
-            )
-            assert os.path.isfile(os.path.join(destination_path, "README.md"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "requirements.txt")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "requirements-dev.txt")
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            main(
+                cli_args=[
+                    "build",
+                    f"--dest={self.destination_dir}",
+                    "application",
+                    "--name=test-app",
+                    "--description=Test application description",
+                ]
             )
 
-            assert os.path.isdir(os.path.join(destination_path, "tests"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "tests", "__init__.py")
-            )
+        output = mock_stdout.getvalue()
+        assert not output
 
-        finally:
-            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+        destination_path = Path() / self.destination_dir
+        assert destination_path.is_dir()
+        assert not (destination_path / "__entry_point__.py").is_file()
+        assert (destination_path / "tests").is_dir()
+        assert (destination_path / "tests" / "__init__.py").is_file()
+        assert (destination_path / ".gitignore").is_file()
+        assert (destination_path / "CHANGELOG.md").is_file()
+        assert (destination_path / "pyproject.toml").is_file()
+        assert (destination_path / "README.md").is_file()
+        assert (destination_path / "requirements.txt").is_file()
+        assert (destination_path / "requirements-dev.txt").is_file()
+        assert (destination_path / "tox.ini").is_file()
 
     def test_build_bootstrap_bootstrap_help(self):
         mock_stdout = io.StringIO()
@@ -200,34 +188,25 @@ class MainTestCase(TestCase):
         assert "--description DESCRIPTION" in output
 
     def test_build_bootstrap_bootstrap(self):
-        destination_path = "tst-application-destination"
-        try:
-            mock_stdout = io.StringIO()
-            with contextlib.redirect_stdout(mock_stdout):
-                main(
-                    cli_args=[
-                        "build",
-                        f"--dest={destination_path}",
-                        "bootstrap",
-                        "--name=test-bs",
-                        "--description=Test bootstrap description",
-                    ]
-                )
-
-            output = mock_stdout.getvalue()
-            assert not output
-
-            assert os.path.exists(destination_path)
-
-            assert os.path.exists(
-                os.path.join(destination_path, "__entry_point__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "demo-file.txt.tmpl")
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            main(
+                cli_args=[
+                    "build",
+                    f"--dest={self.destination_dir}",
+                    "bootstrap",
+                    "--name=test-bs",
+                    "--description=Test bootstrap description",
+                ]
             )
 
-        finally:
-            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+        output = mock_stdout.getvalue()
+        assert not output
+
+        destination_path = Path() / self.destination_dir
+        assert destination_path.is_dir()
+        assert (destination_path / "__entry_point__.py").is_file()
+        assert (destination_path / "demo-file.txt.tmpl").is_file()
 
     def test_build_bootstrap_package_help(self):
         mock_stdout = io.StringIO()
@@ -262,78 +241,46 @@ class MainTestCase(TestCase):
         assert "--repo REPO" in output
 
     def test_build_bootstrap_package(self):
-        destination_path = "tst-package-destination"
-        try:
-            mock_stdout = io.StringIO()
-            with contextlib.redirect_stdout(mock_stdout):
-                main(
-                    cli_args=[
-                        "build",
-                        f"--dest={destination_path}",
-                        "package",
-                        "--name=test-pkg",
-                        "--description=Test package description",
-                        "--author=Test Author",
-                        "--author-email=est.author@mail.loc",
-                        "--repo=https://localhost/test-pkg",
-                    ]
-                )
-
-            output = mock_stdout.getvalue()
-            assert not output
-
-            assert os.path.exists(destination_path)
-
-            assert not os.path.exists(
-                os.path.join(destination_path, "__entry_point__.py")
-            )
-            assert os.path.isfile(os.path.join(destination_path, ".gitignore"))
-            assert os.path.isfile(os.path.join(destination_path, "AUTHORS.md"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "CHANGELOG.md")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "pyproject.toml")
-            )
-            assert os.path.isfile(os.path.join(destination_path, "README.md"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "requirements.txt")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "requirements-dev.txt")
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            main(
+                cli_args=[
+                    "build",
+                    f"--dest={self.destination_dir}",
+                    "package",
+                    "--name=test-pkg",
+                    "--description=Test package description",
+                    "--author=Test Author",
+                    "--author-email=est.author@mail.loc",
+                    "--repo=https://localhost/test-pkg",
+                ]
             )
 
-            assert os.path.isdir(os.path.join(destination_path, "docs"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "__init__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "conf.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "index.rst")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "make.bat")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "Makefile")
-            )
+        output = mock_stdout.getvalue()
+        assert not output
 
-            assert os.path.isdir(os.path.join(destination_path, "test_pkg"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "test_pkg", "__init__.py")
-            )
-
-            assert os.path.isdir(os.path.join(destination_path, "tests"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "tests", "__init__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "tests", "test_package.py")
-            )
-        finally:
-            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+        destination_path = Path() / self.destination_dir
+        assert destination_path.is_dir()
+        assert not (destination_path / "__entry_point__.py").is_file()
+        assert (destination_path / "docs").is_dir()
+        assert (destination_path / "docs" / "__init__.py").is_file()
+        assert (destination_path / "docs" / "conf.py").is_file()
+        assert (destination_path / "docs" / "index.rst").is_file()
+        assert (destination_path / "docs" / "make.bat").is_file()
+        assert (destination_path / "docs" / "Makefile").is_file()
+        assert (destination_path / "test_pkg").is_dir()
+        assert (destination_path / "test_pkg" / "__init__.py").is_file()
+        assert (destination_path / "tests").is_dir()
+        assert (destination_path / "tests" / "__init__.py").is_file()
+        assert (destination_path / "tests" / "test_package.py").is_file()
+        assert (destination_path / ".gitignore").is_file()
+        assert (destination_path / "AUTHORS.md").is_file()
+        assert (destination_path / "CHANGELOG.md").is_file()
+        assert (destination_path / "pyproject.toml").is_file()
+        assert (destination_path / "README.md").is_file()
+        assert (destination_path / "requirements.txt").is_file()
+        assert (destination_path / "requirements-dev.txt").is_file()
+        assert (destination_path / "tox.ini").is_file()
 
     def test_export_bootstrap_help(self):
         mock_stdout = io.StringIO()
@@ -384,52 +331,31 @@ class MainTestCase(TestCase):
         assert "Exports a Python Application's template files" in output
 
     def test_export_bootstrap_application(self):
-        destination_path = "tst-application-destination"
-        try:
-            mock_stdout = io.StringIO()
-            with contextlib.redirect_stdout(mock_stdout):
-                main(
-                    cli_args=[
-                        "export",
-                        f"--dest={destination_path}",
-                        "application",
-                    ]
-                )
-
-            output = mock_stdout.getvalue()
-            assert not output
-
-            assert os.path.exists(destination_path)
-
-            assert os.path.exists(
-                os.path.join(destination_path, "__entry_point__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "{empty}.gitignore.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "CHANGELOG.md.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "pyproject.toml.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "README.md.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "requirements.txt")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "requirements-dev.txt")
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            main(
+                cli_args=[
+                    "export",
+                    f"--dest={self.destination_dir}",
+                    "application",
+                ]
             )
 
-            assert os.path.isdir(os.path.join(destination_path, "tests"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "tests", "__init__.py")
-            )
+        output = mock_stdout.getvalue()
+        assert not output
 
-        finally:
-            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+        destination_path = Path() / self.destination_dir
+        assert destination_path.is_dir()
+        assert (destination_path / "__entry_point__.py").is_file()
+        assert (destination_path / "tests").is_dir()
+        assert (destination_path / "tests" / "__init__.py").is_file()
+        assert (destination_path / "{empty}.gitignore.tmpl").is_file()
+        assert (destination_path / "CHANGELOG.md.tmpl").is_file()
+        assert (destination_path / "pyproject.toml.tmpl").is_file()
+        assert (destination_path / "README.md.tmpl").is_file()
+        assert (destination_path / "requirements.txt").is_file()
+        assert (destination_path / "requirements-dev.txt").is_file()
+        assert (destination_path / "tox.ini.tmpl").is_file()
 
     def test_export_bootstrap_bootstrap_help(self):
         mock_stdout = io.StringIO()
@@ -450,35 +376,24 @@ class MainTestCase(TestCase):
         assert "Exports a Bootstrap's template files" in output
 
     def test_export_bootstrap_bootstrap(self):
-        destination_path = "tst-application-destination"
-        try:
-            mock_stdout = io.StringIO()
-            with contextlib.redirect_stdout(mock_stdout):
-                main(
-                    cli_args=[
-                        "export",
-                        f"--dest={destination_path}",
-                        "bootstrap",
-                    ]
-                )
-
-            output = mock_stdout.getvalue()
-            assert not output
-
-            assert os.path.exists(destination_path)
-
-            assert os.path.exists(
-                os.path.join(destination_path, "__entry_point__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "__entry_point__.py.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "demo-file.txt.tmpl.tmpl")
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            main(
+                cli_args=[
+                    "export",
+                    f"--dest={self.destination_dir}",
+                    "bootstrap",
+                ]
             )
 
-        finally:
-            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+        output = mock_stdout.getvalue()
+        assert not output
+
+        destination_path = Path() / self.destination_dir
+        assert destination_path.is_dir()
+        assert (destination_path / "__entry_point__.py").is_file()
+        assert (destination_path / "__entry_point__.py.tmpl").is_file()
+        assert (destination_path / "demo-file.txt.tmpl.tmpl").is_file()
 
     def test_export_bootstrap_package_help(self):
         mock_stdout = io.StringIO()
@@ -499,83 +414,43 @@ class MainTestCase(TestCase):
         assert "Exports a Python Package's template files" in output
 
     def test_export_bootstrap_package(self):
-        destination_path = "tst-package-destination"
-        try:
-            mock_stdout = io.StringIO()
-            with contextlib.redirect_stdout(mock_stdout):
-                main(
-                    cli_args=[
-                        "export",
-                        f"--dest={destination_path}",
-                        "package",
-                    ]
-                )
-
-            output = mock_stdout.getvalue()
-            assert not output
-
-            assert os.path.exists(destination_path)
-
-            assert os.path.exists(
-                os.path.join(destination_path, "__entry_point__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "{empty}.gitignore.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "AUTHORS.md.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "CHANGELOG.md.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "pyproject.toml.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "README.md.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "requirements.txt")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "requirements-dev.txt")
+        mock_stdout = io.StringIO()
+        with contextlib.redirect_stdout(mock_stdout):
+            main(
+                cli_args=[
+                    "export",
+                    f"--dest={self.destination_dir}",
+                    "package",
+                ]
             )
 
-            assert os.path.isdir(os.path.join(destination_path, "docs"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "__init__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "conf.py.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "index.rst.tmpl")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "make.bat")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "docs", "Makefile")
-            )
+        output = mock_stdout.getvalue()
+        assert not output
 
-            assert os.path.isdir(
-                os.path.join(destination_path, "{underscored_name}")
-            )
-            assert os.path.isfile(
-                os.path.join(
-                    destination_path, "{underscored_name}", "__init__.py.tmpl"
-                )
-            )
-
-            assert os.path.isdir(os.path.join(destination_path, "tests"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "tests", "__init__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "tests", "test_package.py.tmpl")
-            )
-        finally:
-            shutil.rmtree(os.path.join(os.getcwd(), destination_path))
+        destination_path = Path() / self.destination_dir
+        assert destination_path.is_dir()
+        assert (destination_path / "__entry_point__.py").is_file()
+        assert (destination_path / "docs").is_dir()
+        assert (destination_path / "docs" / "__init__.py").is_file()
+        assert (destination_path / "docs" / "conf.py.tmpl").is_file()
+        assert (destination_path / "docs" / "index.rst.tmpl").is_file()
+        assert (destination_path / "docs" / "make.bat").is_file()
+        assert (destination_path / "docs" / "Makefile").is_file()
+        assert (destination_path / "{python_name}").is_dir()
+        assert (
+            destination_path / "{python_name}" / "__init__.py.tmpl"
+        ).is_file()
+        assert (destination_path / "tests").is_dir()
+        assert (destination_path / "tests" / "__init__.py").is_file()
+        assert (destination_path / "tests" / "test_package.py.tmpl").is_file()
+        assert (destination_path / "{empty}.gitignore.tmpl").is_file()
+        assert (destination_path / "AUTHORS.md.tmpl").is_file()
+        assert (destination_path / "CHANGELOG.md.tmpl").is_file()
+        assert (destination_path / "pyproject.toml.tmpl").is_file()
+        assert (destination_path / "README.md.tmpl").is_file()
+        assert (destination_path / "requirements.txt").is_file()
+        assert (destination_path / "requirements-dev.txt").is_file()
+        assert (destination_path / "tox.ini.tmpl").is_file()
 
     def test_register_bootstrap_help(self):
         mock_stdout = io.StringIO()
@@ -622,32 +497,15 @@ class MainTestCase(TestCase):
             destination_path = (
                 RegisterBootstrapOperation.templates_path / "test-bootstrap"
             )
-            destination_path = destination_path.as_posix()
-
-            assert os.path.exists(destination_path)
-
-            assert os.path.isfile(
-                os.path.join(destination_path, "__entry_point__.py")
-            )
-            assert os.path.isfile(
-                os.path.join(destination_path, "some-file.txt")
-            )
-
-            assert os.path.isdir(os.path.join(destination_path, "some-dir"))
-            assert os.path.isfile(
-                os.path.join(destination_path, "some-dir", "copied-file.txt")
-            )
-
-            assert os.path.isdir(
-                os.path.join(destination_path, "{underscored_name}")
-            )
-            assert os.path.isfile(
-                os.path.join(
-                    destination_path,
-                    "{underscored_name}",
-                    "generated-file.txt.tmpl",
-                )
-            )
+            assert destination_path.is_dir()
+            assert (destination_path / "__entry_point__.py").is_file()
+            assert (destination_path / "some-file.txt").is_file()
+            assert (destination_path / "some-dir").is_dir()
+            assert (destination_path / "some-dir" / "copied-file.txt").is_file()
+            assert (destination_path / "{python_name}").is_dir()
+            assert (
+                destination_path / "{python_name}" / "generated-file.txt.tmpl"
+            ).is_file()
         finally:
             shutil.rmtree(
                 RegisterBootstrapOperation.templates_path / "test-bootstrap"

@@ -1,0 +1,49 @@
+[tox]
+envlist =
+    cs
+    ann
+    utc
+
+
+[testenv:format]
+description = "Formats code by black and isort tools"
+deps =
+    black
+    isort
+skip_install = true
+commands =
+    isort .
+    black .
+
+
+[testenv:cs]
+description = "Checks code style by black, isort and flake8 tools"
+deps =
+    black
+    isort
+    flake8
+    flake8-pyproject
+skip_install = true
+commands =
+    isort --check-only --diff .
+    black --check --diff .
+    flake8 .
+
+
+[testenv:ann]
+description = "Checks types annotations by mypy"
+deps = mypy
+skip_install = true
+commands =
+    mypy .
+
+
+[testenv:utc]
+description = "Runs tests under coverage, prints a text report and builds HTML report"
+deps =
+    --requirement={{toxinidir}}/requirements.txt
+    coverage
+commands =
+    coverage run --module unittest discover tests
+    coverage report
+    coverage html

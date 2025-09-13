@@ -52,13 +52,11 @@ class BaseExportBootstrapOperationTestCase(TestCase):
             os.path.join(destination_path, "some-dir", "copied-file.txt")
         )
 
-        assert os.path.isdir(
-            os.path.join(destination_path, "{underscored_name}")
-        )
+        assert os.path.isdir(os.path.join(destination_path, "{python_name}"))
         assert os.path.isfile(
             os.path.join(
                 destination_path,
-                "{underscored_name}",
+                "{python_name}",
                 "generated-file.txt.tmpl",
             )
         )

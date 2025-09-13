@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2025-09-13
+### Added
+- Add `tox.ini` to `application` bootstrap. See `py_bootstrap/templates/application/tox.ini` file for details.
+- Add `tox.ini` to `package` bootstrap. See `py_bootstrap/templates/package/tox.ini` file for details.
+### Changed
+- `underscored_name` placeholder is replaced to `python_name` in all templates and corresponding builders. see `py_bootstrap/templates/` directory for details.
+
 ## [0.7.0] - 2025-06-24
 ### Changed
 - Convert `templates` directory into a Python package. See `py_bootstrap/templates/__init__.py` file for details.

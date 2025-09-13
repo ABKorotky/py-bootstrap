@@ -1,12 +1,12 @@
 [project]
 name = "{name}"
+version = "0.1.0"
 description = "{description}"
 readme = "README.md"
 requires-python = ">={python_major}.{python_minor}"
-dynamic = ["version", "dependencies"]
+dynamic = ["dependencies"]
 
 [tool.setuptools.dynamic]
-version = {{attr = "{underscored_name}.VERSION"}}
 dependencies = {{file = ["requirements.txt"]}}
 
 [tool.black]
@@ -23,7 +23,6 @@ exclude = [".git", ".tox", ".venv"]
 max-line-length = 88
 extend-ignore = ["E203", "E701"]
 import-order-style = "pep8"
-application-import-names = ["{underscored_name}"]
 
 [tool.mypy]
 check_untyped_defs = true
@@ -46,7 +45,7 @@ disable_error_code = [
 
 [tool.coverage.run]
 omit = ["tests/*"]
-source = ["{underscored_name}"]
+source = ["{python_name}"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -56,42 +55,3 @@ exclude_lines = [
 ]
 fail_under = 95
 omit = ["tests/*"]
-
-[tool.tox]
-envlist = ["cs", "ann", "utc"]
-
-[tool.tox.env.format]
-description = "Formats code by black and isort tools"
-deps = ["black", "isort"]
-skip_install = true
-commands = [
-    ["isort", "{underscored_name}"],
-    ["black", "{underscored_name}"],
-]
-
-[tool.tox.env.cs]
-description = "Checks code style by black, isort and flake8 tools"
-deps = ["black", "isort", "flake8", "flake8-pyproject"]
-skip_install = true
-commands = [
-    ["isort", "--check-only", "--diff", "{underscored_name}"],
-    ["black", "--check", "--diff", "{underscored_name}"],
-    ["flake8", "{underscored_name}"],
-]
-
-[tool.tox.env.ann]
-description = "Checks types annotations by mypy"
-deps = ["mypy"]
-skip_install = true
-commands = [
-    ["mypy", "{underscored_name}"],
-]
-
-[tool.tox.env.utc]
-description = "Runs tests under coverage, prints a text report and builds HTML report"
-deps = ["--requirement={{toxinidir}}/requirements.txt", "coverage"]
-commands = [
-    ["coverage", "run", "--module", "unittest", "discover", "tests"],
-    ["coverage", "report"],
-    ["coverage", "html"],
-]

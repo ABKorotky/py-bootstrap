@@ -36,11 +36,11 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.dynamic]
-version = {{attr = "{underscored_name}.VERSION"}}
+version = {{attr = "{python_name}.VERSION"}}
 dependencies = {{file = ["requirements.txt"]}}
 
 [tool.setuptools.packages.find]
-include = ["{underscored_name}*"]
+include = ["{python_name}*"]
 
 [tool.setuptools.package-data]
 "*" = [
@@ -62,7 +62,7 @@ exclude = [".git", ".tox", ".venv"]
 max-line-length = 88
 extend-ignore = ["E203", "E701"]
 import-order-style = "pep8"
-application-import-names = ["{underscored_name}"]
+application-import-names = ["{python_name}"]
 
 [tool.mypy]
 check_untyped_defs = true
@@ -85,7 +85,7 @@ disable_error_code = [
 
 [tool.coverage.run]
 omit = ["tests/*"]
-source = ["{underscored_name}"]
+source = ["{python_name}"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -104,8 +104,8 @@ description = "Formats code by black and isort tools"
 deps = ["black", "isort"]
 skip_install = true
 commands = [
-    ["isort", "{underscored_name}"],
-    ["black", "{underscored_name}"],
+    ["isort", "{python_name}"],
+    ["black", "{python_name}"],
 ]
 
 [tool.tox.env.cs]
@@ -113,9 +113,9 @@ description = "Checks code style by black, isort and flake8 tools"
 deps = ["black", "isort", "flake8", "flake8-pyproject"]
 skip_install = true
 commands = [
-    ["isort", "--check-only", "--diff", "{underscored_name}"],
-    ["black", "--check", "--diff", "{underscored_name}"],
-    ["flake8", "{underscored_name}"],
+    ["isort", "--check-only", "--diff", "{python_name}"],
+    ["black", "--check", "--diff", "{python_name}"],
+    ["flake8", "{python_name}"],
 ]
 
 [tool.tox.env.ann]
@@ -123,7 +123,7 @@ description = "Checks types annotations by mypy"
 deps = ["mypy"]
 skip_install = true
 commands = [
-    ["mypy", "{underscored_name}"],
+    ["mypy", "{python_name}"],
 ]
 
 [tool.tox.env.utc]
@@ -141,7 +141,7 @@ deps = ["--requirement={{toxinidir}}/requirements.txt", "sphinx"]
 allowlist_externals = ["rm"]
 commands = [
     ["rm", "-rf", "docs/modules"],
-    ["sphinx-apidoc", "--separate", "--no-toc", "--no-headings", "--module-first", "--output-dir=docs/modules", "--ext-viewcode", "{underscored_name}"],
+    ["sphinx-apidoc", "--separate", "--no-toc", "--no-headings", "--module-first", "--output-dir=docs/modules", "--ext-viewcode", "{python_name}"],
     ["sphinx-build", "-b", "html", "docs", "docs/build", "-v"],
 ]
 
