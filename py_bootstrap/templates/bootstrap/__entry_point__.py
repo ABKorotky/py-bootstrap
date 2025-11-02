@@ -7,8 +7,8 @@ import logging
 import typing as t
 
 from py_bootstrap.operations import (
-    BaseBuildBootstrapOperation,
     BaseExportBootstrapOperation,
+    DefaultBuildBootstrapOperation,
 )
 
 if t.TYPE_CHECKING:
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 DESCRIPTION = "Provides operations for Bootstraps"
 
 
-class BuildOperation(BaseBuildBootstrapOperation):
+class BuildOperation(DefaultBuildBootstrapOperation):
     cli_description = "Generates a skeleton of a new Bootstrap"
     cli_argument_name_help = "Specifies name of the bootstrap"
     cli_argument_description_help = "Specifies description of the bootstrap"
@@ -34,4 +34,4 @@ class BuildOperation(BaseBuildBootstrapOperation):
 
 
 class ExportOperation(BaseExportBootstrapOperation):
-    cli_description = "Exports a Bootstrap's template files"
+    cli_description = "Exports a Bootstrap template files"

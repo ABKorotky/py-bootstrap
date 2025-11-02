@@ -373,7 +373,7 @@ class MainTestCase(TestCase):
           -h, --help  show this help message and exit
         """
         assert "usage: bootstrap export bootstrap [-h]" in output
-        assert "Exports a Bootstrap's template files" in output
+        assert "Exports a Bootstrap template files" in output
 
     def test_export_bootstrap_bootstrap(self):
         mock_stdout = io.StringIO()

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2025-11-02
+### Changed
+- Move `name` and `description` CLI arguments processing from `BaseBuildBootstrapOperation` to `DefaultBuildBootstrapOperation`. See `py_bootstrap/operations/build_bootstrap.py` file for details.
+
 ## [0.8.0] - 2025-09-13
 ### Added
 - Add `tox.ini` to `application` bootstrap. See `py_bootstrap/templates/application/tox.ini` file for details.

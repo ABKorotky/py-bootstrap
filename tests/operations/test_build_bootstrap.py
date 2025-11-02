@@ -8,15 +8,15 @@ from pathlib import Path
 from unittest import TestCase
 
 import tests.tst_templates as tst_templates_module
-from py_bootstrap.operations import BaseBuildBootstrapOperation
+from py_bootstrap.operations import DefaultBuildBootstrapOperation
 
 if t.TYPE_CHECKING:
     ...
 
 
-class BaseBuildBootstrapOperationTestCase(TestCase):
-    tst_cls = BaseBuildBootstrapOperation
-    tst_obj: BaseBuildBootstrapOperation
+class DefaultBuildBootstrapOperationTestCase(TestCase):
+    tst_cls = DefaultBuildBootstrapOperation
+    tst_obj: DefaultBuildBootstrapOperation
 
     templates_path = Path(tst_templates_module.__file__).parent
 

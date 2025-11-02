@@ -7,8 +7,8 @@ import logging
 import typing as t
 
 from py_bootstrap.operations import (
-    BaseBuildBootstrapOperation,
     BaseExportBootstrapOperation,
+    DefaultBuildBootstrapOperation,
 )
 
 if t.TYPE_CHECKING:
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 DESCRIPTION = "Provides operations for Python Applications"
 
 
-class BuildOperation(BaseBuildBootstrapOperation):
+class BuildOperation(DefaultBuildBootstrapOperation):
     cli_description = "Generates a skeleton of a new Python Application"
     cli_argument_name_help = "Specifies name of the application"
     cli_argument_description_help = "Specifies description of the application"
