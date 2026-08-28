@@ -1,13 +1,27 @@
 __all__ = (
-    "BaseBuildBootstrapOperation",
-    "DefaultBuildBootstrapOperation",
-    "BaseExportBootstrapOperation",
-    "BootstrapsDispatcher",
+    "BOOTSTRAPS_FINDER",
+    "Descriptor",
+    "BuildBootstrapsDispatcherOperation",
+    "BuildBootstrapOperation",
+    "BuildBootstrapNameTitleOperationExt",
+    "BuildBootstrapDescriptionOperationExt",
+    "BuildBootstrapCliNameOperationExt",
+    "BuildBootstrapPythonNamesOperationExt",
+    "ExportBootstrapsDispatcherOperation",
+    "ExportBootstrapOperation",
 )
 
-from .build_bootstrap import (
-    BaseBuildBootstrapOperation,
-    DefaultBuildBootstrapOperation,
+from .bootstraps_finder import BOOTSTRAPS_FINDER
+from .build_bootstraps import (
+    BuildBootstrapCliNameOperationExt,
+    BuildBootstrapDescriptionOperationExt,
+    BuildBootstrapNameTitleOperationExt,
+    BuildBootstrapOperation,
+    BuildBootstrapPythonNamesOperationExt,
+    BuildBootstrapsDispatcherOperation,
 )
-from .dispatcher import BootstrapsDispatcher
-from .export_bootstrap import BaseExportBootstrapOperation
+from .descriptors import Descriptor
+from .export_bootstraps import (
+    ExportBootstrapOperation,
+    ExportBootstrapsDispatcherOperation,
+)

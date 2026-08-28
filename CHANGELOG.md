@@ -38,7 +38,7 @@
 
 ## [0.9.0] - 2025-11-02
 ### Changed
-- Move `name` and `description` CLI arguments processing from `BaseBuildBootstrapOperation` to `DefaultBuildBootstrapOperation`. See `py_bootstrap/operations/build_bootstrap.py` file for details.
+- Move `name` and `description` CLI arguments processing from `BaseBuildBootstrapOperation` to `DefaultBuildBootstrapOperation`. See `py_bootstrap/operations/build_bootstraps/base.py` file for details.
 
 ## [0.8.0] - 2025-09-13
 ### Added
@@ -62,7 +62,7 @@
 - Actualize `README.md` file. Prepare `Using` and `For Development` sections.
 - Refactor implemented bootstraps for unification, fix small bugs and actualize help data. See `py_bootstrap/templates` directory for details.
 - Implement `bootstrap` template for developing bootstraps from scratches. See `py_bootstrap/templates/bootstrap/` directory for details.
-- Implement exporting bootstraps templates operation. See `py_bootstrap/operations/export_bootstrap.py` file for details.
+- Implement exporting bootstraps templates operation. See `py_bootstrap/operations/export_bootstraps/base.py` file for details.
 
 ## [0.5.0] - 2025-06-23
 ### Added

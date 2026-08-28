@@ -1,0 +1,8 @@
+# Put the item in ENABLED_TEMPLATES list
+
+# /pybootstrap/templates/__init__.py
+ENABLED_TEMPLATES = [
+    ...
+    "{cli_name}",
+    ...
+]

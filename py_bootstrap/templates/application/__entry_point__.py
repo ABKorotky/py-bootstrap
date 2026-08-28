@@ -34,4 +34,4 @@ class BuildOperation(DefaultBuildBootstrapOperation):
 
 
 class ExportOperation(BaseExportBootstrapOperation):
-    cli_description = "Exports a Python Application's template files"
+    cli_description = ""

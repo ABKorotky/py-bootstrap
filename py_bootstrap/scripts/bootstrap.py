@@ -1,17 +1,23 @@
 __all__ = ("main", "build_parser")
 
+import logging
 import typing as t
 
-from py_bootstrap.base.operations import BaseOperationsRunner
-from py_bootstrap.operations import BootstrapsDispatcher
+from py_bootstrap.base import BaseOperationsRunner
+from py_bootstrap.main_dispatcher import MainDispatcherOperation
 
 if t.TYPE_CHECKING:
     from argparse import ArgumentParser
 
 
+logging.basicConfig(
+    level=logging.WARNING, format="β %(levelname)s %(message)s - %(name)s"
+)
+
+
 class BootstrapsRunner(BaseOperationsRunner):
     cli_prog = "bootstrap"
-    operation_cls = BootstrapsDispatcher
+    operation_cls = MainDispatcherOperation
 
 
 def build_parser() -> "ArgumentParser":

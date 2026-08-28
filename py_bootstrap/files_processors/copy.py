@@ -17,18 +17,18 @@ class CopyFilesProcessor(BaseFilesProcessor):
     excluded_directories: list[str] = ["__pycache__", ".DS_Store"]
     excluded_file_extensions: list[str] = [".pyc", ".pyd", ".pyo"]
 
-    def check_directory_for_processing(
-        self, rel_path: "Path", dir_name: str
-    ) -> bool:
+    def check_directory_for_processing(self, rel_path: "Path", dir_name: str) -> bool:
         return dir_name not in self.excluded_directories
 
     def process_directory(self, rel_path: "Path", dir_name: str):
         path = self._destination_path.joinpath(rel_path, dir_name)
-        path.mkdir(parents=True, exist_ok=True)
+        if self._dry_run:
+            self.log_dry_run_action(action="make directory %r" % path)
+        else:
+            path.mkdir(parents=True, exist_ok=True)
+            logger.info("%r. make directory %r.", self, path)
 
-    def check_file_for_processing(
-        self, rel_path: "Path", file_name: str
-    ) -> bool:
+    def check_file_for_processing(self, rel_path: "Path", file_name: str) -> bool:
         for excluded_dir in self.excluded_directories:
             if excluded_dir in rel_path.as_posix():
                 return False
@@ -42,4 +42,15 @@ class CopyFilesProcessor(BaseFilesProcessor):
     def process_file(self, rel_path: "Path", file_name: str):
         source_path = self._source_path.joinpath(rel_path, file_name)
         destination_path = self._destination_path.joinpath(rel_path, file_name)
-        copyfile(source_path, destination_path)
+        if self._dry_run:
+            self.log_dry_run_action(
+                action="copy file from %r to %r" % (source_path, destination_path)
+            )
+        else:
+            copyfile(source_path, destination_path)
+            logger.info(
+                "%r. copy file from %r to %r.",
+                self,
+                source_path,
+                destination_path,
+            )

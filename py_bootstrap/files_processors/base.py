@@ -3,7 +3,7 @@ __all__ = ("BaseFilesProcessor",)
 import logging
 import typing as t
 
-from py_bootstrap.base.operations import BaseOperation
+from py_bootstrap.base import BaseOperation
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -13,14 +13,15 @@ logger = logging.getLogger(__name__)
 
 
 class BaseFilesProcessor(BaseOperation):
+
     _source_path: "Path"
     _destination_path: "Path"
 
-    def set_source_path(self, source_path: "Path") -> None:
-        self._source_path = source_path
+    def set_source_path(self, path: "Path"):
+        self._source_path = path
 
-    def set_destination_path(self, destination_path: "Path") -> None:
-        self._destination_path = destination_path
+    def set_destination_path(self, path: "Path") -> None:
+        self._destination_path = path
 
     def run(self):
         for root_path, dirs_names, files_names in self._source_path.walk():
@@ -87,19 +88,13 @@ class BaseFilesProcessor(BaseOperation):
                         file_name,
                     )
 
-    def check_directory_for_processing(
-        self, rel_path: "Path", dir_name: str
-    ) -> bool:
-        raise NotImplementedError(
-            f"{self.__class__}.check_directory_for_generating"
-        )
+    def check_directory_for_processing(self, rel_path: "Path", dir_name: str) -> bool:
+        raise NotImplementedError(f"{self.__class__}.check_directory_for_generating")
 
     def process_directory(self, rel_path: "Path", dir_name: str):
         raise NotImplementedError(f"{self.__class__}.process_directory")
 
-    def check_file_for_processing(
-        self, rel_path: "Path", file_name: str
-    ) -> bool:
+    def check_file_for_processing(self, rel_path: "Path", file_name: str) -> bool:
         raise NotImplementedError(f"{self.__class__}.check_file_for_processing")
 
     def process_file(self, rel_path: "Path", file_name: str) -> None:

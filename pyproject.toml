@@ -102,7 +102,6 @@ include = ["py_bootstrap*"]
 
 [tool.black]
 target-version = ['py313']
-line-length = 80
 
 [tool.isort]
 profile = "black"
