@@ -94,14 +94,35 @@ step can be reused without the build step.
    grant the Read the Docs app access to the repository. Grant it to that single
    repository rather than the whole account unless you plan to publish others.
 3. Choose **Configure automatically** and pick `ABKorotky/py-bootstrap` from the
-   list. If it is missing, use **Configure manually** with the repository URL
-   `https://github.com/ABKorotky/py-bootstrap.git` and the default branch `main`.
+   list, so the project ends up with a **Connected repository**.
+
+   ```{danger}
+   Do **not** use **Configure manually** / "Use manually configured repository
+   URL". A manually configured repository has no integration with GitHub: Read
+   the Docs receives no push or tag events, so nothing ever builds
+   automatically and new tags are never discovered. Nothing appears under
+   GitHub → Settings → Webhooks either, because manual configuration expects
+   you to create and maintain that webhook yourself.
+
+   If the repository is missing from the list, fix the connection rather than
+   working around it - grant the Read the Docs GitHub App access to it under
+   GitHub → Settings → Applications → Installed GitHub Apps → Read the Docs →
+   Configure, then reload the page.
+
+   To check an existing project: **Settings → Repository** must show a
+   *Connected repository*, not a manually configured URL.
+   ```
 4. Set:
    * **Name**: `ak-py-bootstrap` - this becomes the subdomain, so it must match
      the `documentation` URL already declared in `pyproject.toml`
      (`https://ak-py-bootstrap.readthedocs.io/`). A different name gives a
      different domain and that link breaks.
-   * **Default branch**: `main`
+   * **Default branch**: `main`. Leaving it blank makes Read the Docs fall back
+     to the remote's `HEAD`; the dropdown only populates once the repository is
+     properly connected.
+   * **Path for .readthedocs.yaml**: leave **empty**. It takes a path relative
+     to the repository root, not a URL - pasting a `https://github.com/...`
+     link makes Read the Docs look for a file of that name inside the repo.
    * **Language**: English
 5. **Create project.** The first build starts on its own.
 
@@ -190,6 +211,20 @@ Consider setting `latest` to **Hidden** under **Admin → Versions**. It still
 builds and stays reachable by direct URL - useful for you and required for pull
 request previews - but drops out of the version flyout and out of search
 indexing, so consumers are not offered documentation for unreleased code.
+
+```{note}
+**Hidden and Active are separate switches.**
+
+*Hidden* keeps a version building but removes it from the flyout and from search
+indexing. *Inactive* stops it being built at all. To keep unreleased `main` docs
+out of a reader's way while still building them, use Hidden **and** leave the
+version Active.
+
+Deactivating `latest` is also legitimate - tag discovery comes from the
+repository connection, not from `latest` builds - but you then have no rendered
+documentation for unreleased code, and no `latest` for pull request previews to
+compare against.
+```
 
 Under **Admin → Versions**, deactivate old point releases when the list grows;
 each active version is rebuilt and stored.
