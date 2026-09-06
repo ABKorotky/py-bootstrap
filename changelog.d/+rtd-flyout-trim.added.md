@@ -1,1 +1,0 @@
-Added `docs/static/rtd-flyout.js`, which removes the "On Read the Docs" section (Project Home, Builds) from the Read the Docs flyout menu. Read the Docs offers no setting for this and the flyout exposes no CSS hooks, so it is done with a small script loaded through `html_js_files`.

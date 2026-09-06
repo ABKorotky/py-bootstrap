@@ -2,6 +2,13 @@
 
 <!-- towncrier release notes start -->
 
+## [0.9.3] - 2026-09-06
+### Added
+- Added `docs/static/rtd-flyout.js`, which removes the "On Read the Docs" section (Project Home, Builds) from the Read the Docs flyout menu. Read the Docs offers no setting for this and the flyout exposes no CSS hooks, so it is done with a small script loaded through `html_js_files`.
+
+### Changed
+- Documented building the published documentation from release tags: `stable` as the default Read the Docs version, activating `v*` tag versions, and hiding `latest` so readers are offered documentation matching a released artefact. The README badge and link now point at `stable`.
+
 ## [0.9.2] - 2026-09-06
 ### Added
 - Added `docs/releasing/configure-readthedocs.md`, a setup guide for hosting the documentation on Read the Docs: creating the project, verifying the first build, the version and automation-rule settings, pull request previews, and troubleshooting.

@@ -1,1 +1,0 @@
-Documented building the published documentation from release tags: `stable` as the default Read the Docs version, activating `v*` tag versions, and hiding `latest` so readers are offered documentation matching a released artefact. The README badge and link now point at `stable`.
