@@ -1,1 +1,0 @@
-Switched the default release index to the real PyPI. `make dist-upload` and `make release` now upload to `pypi` instead of `testpypi`; pass `PYPI=testpypi` to rehearse a release against the sandbox index.

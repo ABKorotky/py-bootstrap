@@ -1,1 +1,0 @@
-Added `tools/check_matrix.py`, which fails when the supported-Python list drifts apart. The interpreters are declared three times with nothing linking them — `tox.ini` `env_list`, the `pyproject.toml` classifiers and the `ci.yml` test matrix — so adding a version in one place and forgetting the others used to pass silently. `make test` runs it before handing over to `tox`.

@@ -1,1 +1,0 @@
-Added coverage reporting to Codecov. The suite now writes `coverage.xml` alongside the existing terminal and HTML reports, and the `ci` workflow uploads it once per interpreter. The coverage gate itself is unchanged — `fail_under = 95` still fails `make test` locally and in CI, so the upload is reporting only and a Codecov outage cannot turn the build red.

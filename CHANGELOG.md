@@ -2,6 +2,24 @@
 
 <!-- towncrier release notes start -->
 
+## [0.9.4] - 2026-09-07
+### Added
+- Added `tools/check_matrix.py`, which fails when the supported-Python list drifts apart. The interpreters are declared three times with nothing linking them — `tox.ini` `env_list`, the `pyproject.toml` classifiers and the `ci.yml` test matrix — so adding a version in one place and forgetting the others used to pass silently. `make test` runs it before handing over to `tox`.
+- Added a `CLAUDE.md` at the repository root describing the project for Claude Code: the `make`-driven command set, the mandatory `changelog.d/` news fragment, the operation-object and entry-point discovery architecture, the templating rules that are easy to get wrong (rendered destination paths, the `.tmpl` suffix, the `{empty}` dotfile placeholder), and the test fixture layout. It also sets a 200-line limit on every `CLAUDE.md` in the repository.
+- Added coverage reporting to Codecov. The suite now writes `coverage.xml` alongside the existing terminal and HTML reports, and the `ci` workflow uploads it once per interpreter. The coverage gate itself is unchanged — `fail_under = 95` still fails `make test` locally and in CI, so the upload is reporting only and a Codecov outage cannot turn the build red.
+- Declared support for Python 3.14 with a `Programming Language :: Python :: 3.14` classifier. The test suite already ran on `py314` through `tox`, but the package metadata advertised only 3.13.
+
+### Changed
+- Corrected the maintainer release docs after `release.yml` was removed. `docs/releasing/configure-github-actions.md` and `configure-pypi.md` described a release pipeline that no longer exists and listed `tools/` scripts that were never written; both now open with a "not implemented" admonition and read as a design record. The contributing guide documents the actual flow, which is `make release` from a clean checkout.
+- Extended the code style and annotation checks to `tools/`. `make format`, `make cs` and `make ann` previously covered only `py_bootstrap/` and `tests/`, leaving the release and check scripts unchecked.
+- Folded the separate `changelog` workflow into `.github/workflows/ci.yml` as another `make cl-check` leg, and dropped the `skip-changelog` label bypass. The `ci` workflow is now exactly `make check` split across parallel jobs, so a check either fails in both places or neither — `make check` also runs `doc`, which previously only ran on GitHub.
+- Switched the default release index to the real PyPI. `make dist-upload` and `make release` now upload to `pypi` instead of `testpypi`; pass `PYPI=testpypi` to rehearse a release against the sandbox index.
+- Upgraded the `ci` workflow to `actions/checkout@v7` and `actions/setup-python@v7`. The previous major versions target Node.js 20, which GitHub has deprecated, so every job emitted a warning and was silently forced onto Node.js 24.
+
+### Fixed
+- Corrected the Read the Docs setup guide on two settings that silently stop automatic builds: the project must use a **Connected repository** rather than a manually configured repository URL, which leaves it with no GitHub integration at all, so no push or tag event ever reaches Read the Docs; and the `.readthedocs.yaml` path field takes a path relative to the repository root, not a URL. Also clarified that a version being *Hidden* and being *Active* are independent settings.
+- Fixed the `ci` GitHub Actions workflow, which invoked `tox` environments (`cs`, `ann`, `utc`, `doc`) that `tox.ini` does not define, so every run failed. The checks now go through `make`, matching how they are documented and run locally, and the suite runs once per supported interpreter with only that interpreter installed.
+
 ## [0.9.3] - 2026-09-06
 ### Added
 - Added `docs/static/rtd-flyout.js`, which removes the "On Read the Docs" section (Project Home, Builds) from the Read the Docs flyout menu. Read the Docs offers no setting for this and the flyout exposes no CSS hooks, so it is done with a small script loaded through `html_js_files`.

@@ -1,1 +1,0 @@
-Upgraded the `ci` workflow to `actions/checkout@v7` and `actions/setup-python@v7`. The previous major versions target Node.js 20, which GitHub has deprecated, so every job emitted a warning and was silently forced onto Node.js 24.

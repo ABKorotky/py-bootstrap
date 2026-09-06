@@ -1,1 +1,0 @@
-Fixed the `ci` GitHub Actions workflow, which invoked `tox` environments (`cs`, `ann`, `utc`, `doc`) that `tox.ini` does not define, so every run failed. The checks now go through `make`, matching how they are documented and run locally, and the suite runs once per supported interpreter with only that interpreter installed.

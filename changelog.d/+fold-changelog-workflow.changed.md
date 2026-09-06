@@ -1,1 +1,0 @@
-Folded the separate `changelog` workflow into `.github/workflows/ci.yml` as another `make cl-check` leg, and dropped the `skip-changelog` label bypass. The `ci` workflow is now exactly `make check` split across parallel jobs, so a check either fails in both places or neither — `make check` also runs `doc`, which previously only ran on GitHub.
