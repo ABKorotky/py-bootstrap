@@ -149,7 +149,7 @@ release: cut-tag dist-build dist-upload  ## Cut the tag, build, upload (VERSION=
 
 .PHONY: clean
 clean:  ## Remove build, test and doc artefacts (keeps every virtualenv)
-	rm -rf build dist docs/modules $(DOC_OUT) htmlcov .coverage .mypy_cache
+	rm -rf build dist docs/modules $(DOC_OUT) htmlcov .coverage coverage.xml .mypy_cache
 	find . -name '__pycache__' -type d -prune -exec rm -rf {} +
 
 .PHONY: venvclean

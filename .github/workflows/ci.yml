@@ -39,10 +39,10 @@ jobs:
       matrix:
         target: [cs, ann, doc, cl-check]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0        # setuptools-scm (doc) and cl-check need history + tags
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: pip
@@ -64,12 +64,21 @@ jobs:
           - python: "3.14"
             toxenv: py314
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0        # setuptools-scm needs full history + tags
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
           cache: pip
           cache-dependency-path: pyproject.toml
       - run: make test PY_ENV=${{ matrix.toxenv }} PYTHON=python
+      # Reporting only - the coverage gate is `fail_under` in pyproject.toml,
+      # which `make test` already enforced above. A Codecov outage must not
+      # turn the build red, hence fail_ci_if_error: false.
+      - uses: codecov/codecov-action@v7
+        with:
+          files: ./coverage.xml
+          flags: ${{ matrix.toxenv }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
