@@ -2,6 +2,10 @@
 
 <!-- towncrier release notes start -->
 
+## [0.9.5] - 2026-09-07
+### Changed
+- Changed the README installation instructions to `pip install ak-py-bootstrap`. The package is now published on production PyPI, so the TestPyPI index URL is no longer needed.
+
 ## [0.9.4] - 2026-09-07
 ### Added
 - Added `tools/check_matrix.py`, which fails when the supported-Python list drifts apart. The interpreters are declared three times with nothing linking them — `tox.ini` `env_list`, the `pyproject.toml` classifiers and the `ci.yml` test matrix — so adding a version in one place and forgetting the others used to pass silently. `make test` runs it before handing over to `tox`.
