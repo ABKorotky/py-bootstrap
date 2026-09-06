@@ -1,1 +1,0 @@
-Reduced `tox.ini` to the interpreter matrix (`py313`, `py314`) running the test suite. Every other task moved to the `Makefile`.

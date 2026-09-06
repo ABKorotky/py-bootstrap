@@ -1,1 +1,0 @@
-Removed `requirements.txt` and `requirements-dev.txt`. Dependencies are declared in `pyproject.toml` as PEP 735 dependency groups; install them with `pip install -e . --group dev` or `make deps`.

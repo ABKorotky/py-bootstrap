@@ -1,1 +1,0 @@
-Project version is now derived from git tags via `setuptools-scm`. The hand-maintained `NAME`, `TITLE`, `DESCRIPTION`, `VERSION`, `PY_VERSION`, `AUTHOR` and `AUTHOR_EMAIL` constants were removed from `py_bootstrap/__init__.py`; consumers read `importlib.metadata` instead.

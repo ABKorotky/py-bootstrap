@@ -1,1 +1,0 @@
-Added GitHub Actions workflows: `ci` (style, types, tests and docs on every pull request), `changelog` (fails a pull request that adds no news fragment) and `release` (builds and publishes to PyPI through Trusted Publishing on a `v*` tag, then creates the GitHub Release).

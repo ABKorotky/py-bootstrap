@@ -1,1 +1,0 @@
-Adopted `towncrier` for changelog management. Document user-facing changes by adding a news fragment under `changelog.d/` (see `changelog.d/README.md`); the release flow collates them into `CHANGELOG.md`.
