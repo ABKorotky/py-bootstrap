@@ -1,1 +1,0 @@
-Changed the `towncrier` output template so generated `CHANGELOG.md` sections match the compact style of the hand-written history: no blank line after the version or category headings, one blank line between categories.

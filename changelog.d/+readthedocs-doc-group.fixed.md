@@ -1,1 +1,0 @@
-Fixed the Read the Docs build: `.readthedocs.yaml` installed a `docs` dependency group, but the group in `pyproject.toml` is named `doc`. Every build failed at the `pre_build` step with `Dependency group 'docs' not found`.

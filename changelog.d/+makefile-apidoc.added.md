@@ -1,1 +1,0 @@
-Added a `make apidoc` target that regenerates the `docs/modules/` API stubs. `make doc` depends on it and Read the Docs calls it with `VENV=$READTHEDOCS_VIRTUALENV_PATH`, so the `sphinx-apidoc` flags are defined once instead of being duplicated in `.readthedocs.yaml`, and Read the Docs no longer needs a second virtualenv.

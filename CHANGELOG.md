@@ -2,6 +2,17 @@
 
 <!-- towncrier release notes start -->
 
+## [0.9.2] - 2026-09-06
+### Added
+- Added `docs/releasing/configure-readthedocs.md`, a setup guide for hosting the documentation on Read the Docs: creating the project, verifying the first build, the version and automation-rule settings, pull request previews, and troubleshooting.
+- Added a `make apidoc` target that regenerates the `docs/modules/` API stubs. `make doc` depends on it and Read the Docs calls it with `VENV=$READTHEDOCS_VIRTUALENV_PATH`, so the `sphinx-apidoc` flags are defined once instead of being duplicated in `.readthedocs.yaml`, and Read the Docs no longer needs a second virtualenv.
+
+### Changed
+- Changed the `towncrier` output template so generated `CHANGELOG.md` sections match the compact style of the hand-written history: no blank line after the version or category headings, one blank line between categories.
+
+### Fixed
+- Fixed the Read the Docs build: `.readthedocs.yaml` installed a `docs` dependency group, but the group in `pyproject.toml` is named `doc`. Every build failed at the `pre_build` step with `Dependency group 'docs' not found`.
+
 ## [0.9.1] - 2026-09-06
 ### Added
 - Added GitHub Actions workflows: `ci` (style, types, tests and docs on every pull request), `changelog` (fails a pull request that adds no news fragment) and `release` (builds and publishes to PyPI through Trusted Publishing on a `v*` tag, then creates the GitHub Release).
