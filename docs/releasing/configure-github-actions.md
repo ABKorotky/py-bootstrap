@@ -1,10 +1,24 @@
 # Configure GitHub Actions for releases
 
-Covers the repository changes and GitHub settings the `release` workflow needs.
-Do [configure-pypi.md](configure-pypi.md) as well - the two are independent halves
-of the same setup.
+```{admonition} Not implemented
+:class: important
 
-Files this adds to the repo:
+`.github/workflows/release.yml` was removed on 2026-09-07 and release automation
+was deferred. **Releasing is currently manual**: `make release VERSION=X.Y.Z`
+from a clean checkout, which uploads to the index named by `PYPI` (default
+`pypi`). No tag push triggers anything today.
+
+This document is the design record for when automation returns. Nothing below is
+wired up, and the file and job names are proposals, not current state.
+```
+
+Covers the repository changes and GitHub settings a `release` workflow would
+need. Do [configure-pypi.md](configure-pypi.md) as well - the two are independent
+halves of the same setup.
+
+Files such a workflow would add to the repo (none of these exist yet; the
+existing release helpers are `tools/check_version.py`, `tools/check_no_diff.py`
+and `tools/smoke.py`, all driven by the `Makefile`):
 
 | Path                                   | Purpose                                             |
 | -------------------------------------- | -------------------------------------------------- |
@@ -182,14 +196,8 @@ What each tag triggers in CI:
 
 `ci.yml` is migrated: it is `make check`, split across jobs so the legs run in
 parallel. The separate `changelog.yml` was folded in as another `make cl-check`
-leg.
-
-```{warning}
-`release.yml` has not been migrated. It still calls `tox -e release-check`,
-`tox -e build` and `tox -e smoke --installpkg dist/*.whl` - envs that no longer
-exist now that `tox.ini` is reduced to the interpreter matrix. **Releases fail
-until it is converted to the `make` targets above.**
-```
+leg. A future `release.yml` should follow the same rule and call `make` targets
+rather than reimplementing the steps.
 
 Once converted, the workflows will only add GitHub-specific plumbing on top of
 the same targets a developer runs locally: checkout depth, passing `dist/`

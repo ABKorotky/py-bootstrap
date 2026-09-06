@@ -78,7 +78,19 @@ merges only), and monotonically increasing tags on `main`.
 
 ## Releasing
 
-Version, changelog and publishing are automated — see the release docs in the
-repository (`docs/releasing/`) for the full flow, PyPI Trusted Publishing setup,
-the GitHub Actions configuration and the Read the Docs setup
-(`configure-readthedocs.md`).
+Releasing is manual and runs from a clean checkout:
+
+```console
+$ make cl-preview VERSION=0.10.0   # read the section the fragments will produce
+$ make release VERSION=0.10.0      # cut-tag + dist-build + dist-upload
+$ git push origin main --follow-tags
+```
+
+`make release` uploads to the index named by `PYPI`, which defaults to the real
+PyPI — pass `PYPI=testpypi` to rehearse. Versions come from git tags via
+`setuptools-scm`, and `cut-tag` refuses to run on a dirty tree or a version whose
+tag already exists.
+
+Maintainer notes live in `docs/releasing/` (excluded from this site): the
+changelog flow, the Read the Docs setup, and the design for release automation —
+which is not implemented, as `release.yml` was removed.

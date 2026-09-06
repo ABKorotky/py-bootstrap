@@ -4,18 +4,12 @@ Provides functionality for generating skeletons for Python projects.
 [![PyPI](https://img.shields.io/pypi/v/ak-py-bootstrap.svg)](https://pypi.org/project/ak-py-bootstrap/)
 [![Python](https://img.shields.io/pypi/pyversions/ak-py-bootstrap.svg)](https://pypi.org/project/ak-py-bootstrap/)
 [![ci](https://github.com/ABKorotky/py-bootstrap/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ABKorotky/py-bootstrap/actions/workflows/ci.yml)
+[![coverage](https://codecov.io/gh/ABKorotky/py-bootstrap/branch/main/graph/badge.svg)](https://codecov.io/gh/ABKorotky/py-bootstrap)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/ABKorotky/py-bootstrap/blob/main/LICENSE)
 [![Documentation Status](https://app.readthedocs.org/projects/ak-py-bootstrap/badge/?version=stable)](https://ak-py-bootstrap.readthedocs.io/en/stable/)
 
-<!-- Waiting on its prerequisite. Uncomment when it lands, keeping the row
-     ordered: PyPI, Python, ci, coverage, License, Documentation.
-       - coverage -> a coverage upload step in the `test` job of ci.yml and the
-                     project enabled on Codecov; until then it renders "unknown"
-     All hrefs must stay absolute: this README also renders on the PyPI project
-     page, where relative links 404.
-
-[![coverage](https://codecov.io/gh/ABKorotky/py-bootstrap/branch/main/graph/badge.svg)](https://codecov.io/gh/ABKorotky/py-bootstrap)
--->
+<!-- Badge hrefs must be absolute: this README also renders on PyPI, where
+     relative links 404. -->
 
 # For Consumers
 

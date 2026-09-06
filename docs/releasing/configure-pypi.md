@@ -1,9 +1,18 @@
 # Configure PyPI and TestPyPI
 
-The `release` workflow uploads with **Trusted Publishing** (OIDC). GitHub Actions
-proves its identity to PyPI and receives a short-lived, project-scoped upload
-token at publish time. Nothing is stored in the repo, there is no secret to
-rotate, and nothing to leak.
+```{admonition} Not implemented
+:class: important
+
+Trusted Publishing needs a GitHub Actions workflow to authenticate, and
+`release.yml` was removed on 2026-09-07. Uploads currently go through
+`make dist-upload`, which uses `twine` and an index alias from your `~/.pypirc`.
+Set that up first; everything below applies once release automation returns.
+```
+
+A `release` workflow would upload with **Trusted Publishing** (OIDC). GitHub
+Actions proves its identity to PyPI and receives a short-lived, project-scoped
+upload token at publish time. Nothing is stored in the repo, there is no secret
+to rotate, and nothing to leak.
 
 You configure this **once per index** (PyPI and TestPyPI are separate services
 with separate accounts, and each needs its own trusted-publisher entry).
@@ -15,8 +24,8 @@ with separate accounts, and each needs its own trusted-publisher entry).
 * A PyPI account and a TestPyPI account, both with 2FA enabled.
 * The project already exists on PyPI as **`ak-py-bootstrap`** (it does). If it did
   not, use the *pending publisher* form instead - see the note at the end.
-* Decide the two GitHub *environment* names the workflow uses. They must match
-  `release.yml` exactly:
+* Decide the two GitHub *environment* names the workflow will use. They must
+  match `release.yml` exactly, once it exists:
 
   | Index    | GitHub environment | Uploaded by job     |
   | -------- | ------------------ | ------------------- |
