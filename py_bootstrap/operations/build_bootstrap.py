@@ -13,7 +13,6 @@ from datetime import datetime
 from functools import cached_property
 from pathlib import Path
 
-from py_bootstrap import PY_VERSION
 from py_bootstrap.files_processors import GenerateFilesProcessor
 
 from .base import BaseBootstrapsOperation
@@ -23,6 +22,10 @@ if t.TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
+
+# Default target Python for generated projects, feeding the `python_major` /
+# `python_minor` template placeholders.
+PY_VERSION = (3, 13)
 
 
 class BuildBootstrapsDispatcherOperation(BaseBootstrapsOperation):

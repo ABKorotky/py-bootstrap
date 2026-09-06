@@ -1,6 +1,10 @@
 # Bootstrapping of Python projects
 Provides functionality for generating skeletons for Python projects.
 
+[![Documentation Status](https://app.readthedocs.org/projects/ak-py-bootstrap/badge/?version=latest)](https://ak-py-bootstrap.readthedocs.io/en/latest/)
+
+Documentation: https://ak-py-bootstrap.readthedocs.io/
+
 # For Consumers
 
 ## Installation
@@ -285,21 +289,40 @@ Run the following commands:
 ```bash
 python3.13 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
+pip install --upgrade pip
+pip install -e . --group dev
 ```
+Dev tooling is declared as [PEP 735](https://peps.python.org/pep-0735/) dependency
+groups in `pyproject.toml` (`test`, `format`, `cs`, `ann`, `doc`, `changelog`,
+`scm`, `dist`, `release`, and the umbrella `dev`). The tool has no runtime
+dependencies.
 
-### Using tox tool in development
-The package provides the following ['tox' tooling](https://tox.wiki/en/latest/):
-- `cs`. Code Style. Checks project's code style using `black` and `flake8` tools.
+### Using make in development
+Development and release tasks run through `make`. Each target installs the
+dependency group it needs into a single `.venv` on demand, so the toolchain is
+provisioned lazily rather than duplicated per task:
+- `deps`. Installs every dev dependency into `.venv`.
+- `cs`. Code Style. Checks project's code style using `isort`, `black` and `flake8` tools.
 - `ann`. Annotation. Checks types annotations in the project using `mypy` tool.
-- `utc`. Unit Tests with Coverage. Runs project's unit tests and calculates a level of coverage.
+- `test`. Unit Tests with Coverage. Runs the suite on every supported interpreter via `tox`. `make test PY_ENV=py313` runs just one.
+- `check`. Runs `cs`, `ann` and `test`.
 - `format`. Formatting. Reformats code in the project using `black` and `isort` tools.
 - `doc`. Documentation. Generates project's documentation using `sphinx` tool.
-- `build`. Builds an archive for distributing the project via PyPI.
-- `upload`. Uploads a prepared distribution archive into one of PyPI (main or test). Uses Test PyPI by default.
+- `cl-preview VERSION=X.Y.Z`. Changelog Draft. Previews the section the `changelog.d/` fragments would produce.
+- `cl-check`. Changelog Check. Fails if the branch adds no news fragment (CI runs this on every PR).
+- `cl-build VERSION=X.Y.Z`. Changelog. Collates `changelog.d/` fragments into `CHANGELOG.md` and removes them.
+- `cut-tag VERSION=X.Y.Z`. Verifies the version is releasable and unused and the working tree is clean, writes the `## [X.Y.Z]` section, commits it as `Prepare X.Y.Z version` and tags `vX.Y.Z`.
+- `dist-build`. Builds the sdist and wheel into `dist/` from a clean working tree, then installs the wheel into a throwaway virtualenv and checks `bootstrap list` works.
+- `dist-upload`. Uploads `DIST` (default `dist/*`) to `PYPI` (default `testpypi`) after `twine check --strict`.
+- `release VERSION=X.Y.Z [PYPI=pypi]`. The whole flow: `cut-tag`, `dist-build`, `dist-upload`, stopping at the first failure.
+- `clean` / `venvclean`. Removes build, test and doc artefacts / also removes the virtualenvs (`.venv` and `.tox/`).
 
-Run `tox l` command for details.
+Run `make` with no target for the full list.
+
+### Using tox in development
+`tox` is kept for one job: running the test suite against every supported
+interpreter. `tox` runs `py313` and `py314`; `tox -e py313` runs just one.
+Everything else lives in the `Makefile`.
 
 ### Development rules and agreements
 Follow Python's principles [PEP 20 – The Zen of Python](https://peps.python.org/pep-0020/):
@@ -314,34 +337,58 @@ Follow ["SOLID"](https://en.wikipedia.org/wiki/SOLID) principles:
 - Dependency inversion principle.
 
 ### Branching model
-Based on "GitHub-Flow". Extends by release branches on demand. Rules:
-- `main` branch is default stable branch. It uses for releasing new stable distributions.
-- Use different `<feature>` branches for developing. Count of commits in feature branches and them messages are not limited.
-- Code in "feature" branches should be prepared and tested properly before merging. Running `tox` should pass successfully.
-- Merging branches is enabled in the same branch from it was born. Squash commits before merging. Make rebasing on target branch, merge with `--ff-only` strategy.
-- Merging code in `main` branch is an intention to release it. So, almost all commits in `main` branch should be tagged.
-- Follow [PEP 440](https://peps.python.org/pep-0440/) principles for tagging commits.
-- Tags in `<major>.<minor>.<patch>` in `main` branch are placeholders for creating corresponded release branches.
-- Use release branches for maintaining several versions at the same time. Format of release branches is `release/<major>.<minor>`.
-- Tags on `main` branch should increase monotonic. It's forbidden to create tags in sequence like: `0.2.0` -> `0.2.1` -> `0.3.0` -> `0.3.1` -> `0.2.2`. Start a release branch `release/0.2` from tag `0.2.1` and implement required logic. Mark the commit in the release branch as `0.2.2` and release it.
-- Use `cherry-pick` mechanisms for transferring changes between `main` branch and supported release branches. So, make `cherry-pick` of `0.2.2` commit from `release/0.2` branch into `main` and deliver it as `0.3.2` for instance.
+Based on "GitHub-Flow", extended by release branches on demand.
 
-Recap: Every time commits structure in the project should look as a tree.
+**Branches**
+- `main` is the default stable branch; stable distributions are released from it.
+- Develop on `<feature>` branches — commit count and messages there are not limited.
+- Older lines live on `release/<major>.<minor>` branches, cut from that line's last tag. A release branch carries its own `CHANGELOG.md` and `changelog.d/`.
+
+**Merging** — enforced by GitHub, not done by hand:
+- The only enabled merge method is **squash**, so every PR lands as one commit.
+- A ruleset on `main` and `release/*` requires a PR, passing `ci` checks (`cs`, `ann`, `utc`, `doc`), the `changelog` check, **linear history** (no merge commits), and the **merge queue**.
+- The merge queue rebases the PR onto the current target, re-runs the checks, and fast-forwards it in — no manual squash, rebase, or `--ff-only`. Enable auto-merge on the PR and leave it.
+
+**Tags & releases**
+- Tag per [PEP 440](https://peps.python.org/pep-0440/), `v`-prefixed: `vX.Y.Z`, `vX.Y.ZrcN`. Merging into `main` is an intention to release, so almost every commit on `main` is tagged.
+- Cut a release the same way on `main` or a release branch: `make release VERSION=X.Y.Z` (see [Releasing new distributions flow](#releasing-new-distributions-flow)). The `release` workflow accepts any `v*` tag whose commit is reachable from `main` or a `release/*` branch.
+- Tags on `main` must increase monotonically. Do **not** tag `v0.2.0 -> v0.2.1 -> v0.3.0 -> v0.2.2`; instead branch `release/0.2` from `v0.2.1`, fix there, and tag `v0.2.2`.
+- Move fixes between lines with `cherry-pick` — e.g. cherry-pick the `v0.2.2` fix from `release/0.2` into `main` and ship it as `v0.3.2`.
+
+Recap: history on `main` stays a straight line, with release branches forking off tag points.
 
 ### Releasing new distributions flow
-1. Create a `feature` branch from `main` or release one.
-2. Make corresponding changes. Don't be afraid to run `tox -e format` and `tox` sometimes during development.
-3. Run `tox -e doc`.
-4. Examine generated documentation.
-5. Squash all commits into one and rebase your changes on the actual state of the target branch.
-6. Write what you have done in `CHANGELOG.md` file into the corresponding section. Don't forget to actualize the `VERSION` of these changes in `py_bootstrap/__init__.py` file.
-7. Examine diff before merging, clean it from accidentally committed garbage.
-8. Run `tox -e format` on ready for merging commit. 
-9. Run `tox` of ready for merging commit. Ensure that the command passed successfully.
-10. Merge your `feature` branch into target one: `main` or one of `release`.
-11. Mark the commit by tag according to the version from `CHANGELOG.md` file.
-12. Prepare a distribution from the tag. Run `tox -e build`. Make final checks with generated archive. Ensure it is installed properly.
-13. Publish the archive in Test PyPI. Run `tox -e upload -- dist/ak_py_bootstrap-<version>.tar.gz`. Ensure that the distribution is installed properly from Test PyPI. Prepare a temporary environment and run `pip install --extra-index-url=https://test.pypi.org/simple/ ak-py-bootstrap`.
-14. Publish the archive in main PyPI. Run `export PYPI_REPOSITORY_ALIAS=pypi` for switching uploading to main PyPI and repeat uploading via `tox -e upload -- ...`. Ensure that the distribution is installed properly from PyPI. Prepare a temporary environment and run `pip install ak-py-bootstrap`.
 
-Use this flow for releasing distributions from release branches.
+The project version comes from the git tag (`setuptools-scm`), `CHANGELOG.md` is
+assembled by `towncrier` from news fragments in `changelog.d/`, and publishing is
+done by the `release` GitHub Actions workflow through PyPI Trusted Publishing — no
+version constant to bump, no tokens, no manual `twine`. Setup and details:
+[`docs/releasing/`](docs/releasing/). Tags are `v`-prefixed (`v0.10.0`);
+`setuptools-scm` also reads the older bare tags.
+
+1. Create a `feature` branch from `main` or a release one.
+2. Make the changes. Run `make format` and `make check` during development.
+3. Add a news fragment under `changelog.d/` describing the change (see
+   [`changelog.d/README.md`](changelog.d/README.md)); `make cl-check` mirrors
+   what CI enforces on the PR.
+4. Run `make doc` and examine the generated documentation.
+5. Squash to one commit, rebase on the target branch, clean the diff.
+6. Run `make format`, then `make check`, on the final commit; ensure both pass.
+   Run `tox` too if the change could be interpreter-sensitive.
+7. Merge the `feature` branch into the target (`main` or `release/<major>.<minor>`).
+8. On the merge commit, decide the version and cut the release:
+   ```
+   make cl-preview VERSION=0.10.0   # read the section the fragments will produce
+   make cut-tag VERSION=0.10.0      # verify, write CHANGELOG.md, commit, tag v0.10.0
+   make dist-build                  # build and check the wheel installs
+   make dist-upload                 # -> Test PyPI; PYPI=pypi for production
+   git push origin <branch> --follow-tags
+   ```
+   `make release VERSION=0.10.0` runs those three steps in one go.
+9. Validate in a fresh environment: `pip install ak-py-bootstrap`.
+
+To rebuild an already released version, check out its tag and run
+`make dist-build dist-upload` — `dist-build` derives the version from the tag,
+so the artefacts are identical to the original.
+
+Use the same flow for releasing distributions from release branches.

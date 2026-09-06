@@ -1,11 +1,6 @@
-# <bootstrap-title> Changelog
+# Py Bootstrap Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
+<!-- towncrier release notes start -->
 
 ## [0.9.0] - 2025-11-02
 ### Changed
@@ -36,14 +31,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement exporting bootstraps templates operation. See `py_bootstrap/operations/export_bootstrap.py` file for details.
 
 ## [0.5.0] - 2025-06-23
-## Added
+### Added
 - Implement `FilesProcessors` functionality. See `py_bootstrap/files_processors/` directory for details.
 
 ### Changed
 - Refactor operations functionality. See `py_bootstrap/operations/` directory for details.
 - Rename `BaseOperationsDispatcher` to `BaseRecursiveOperationsContainer`, move it in a separated file. See `/py_bootstrap/base/operations/recursive_container.py` file for details.
 
-### [0.4.0] - 2025-06-02
+## [0.4.0] - 2025-06-02
 ### Added
 - Implement `RegisterBootstrapOperation` class for registering new customer's bootstraps. See `/py_bootstrap/operations/register_bootstrap.py` file for details.
 - Prepare `template` bootstrap structure. See `/py_bootstrap/templates/template/` directory for details.

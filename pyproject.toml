@@ -19,27 +19,73 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Topic :: Utilities",
 ]
-dynamic = ["version", "dependencies"]
+dynamic = ["version"]
+dependencies = []
 
 [project.entry-points.py_bootstrap_templates]
 py_bootstrap = "py_bootstrap.templates"
 
 [project.urls]
+documentation = "https://ak-py-bootstrap.readthedocs.io/"
 repository = "https://github.com/ABKorotky/py-bootstrap.git"
 changelog = "https://github.com/ABKorotky/py-bootstrap/blob/main/CHANGELOG.md"
+
+[project.scripts]
+bootstrap = "py_bootstrap.scripts.bootstrap:main"
 
 [build-system]
 requires = [
     "setuptools",
+    "setuptools-scm",
 ]
 build-backend = "setuptools.build_meta"
 
+[dependency-groups]
+test = ["coverage"]
+tox = ["tox>=4.22"]
+format = [
+    "black",
+    "isort"
+]
+cs = [
+    {include-group = "format"},
+    "flake8",
+    "flake8-pyproject"
+]
+ann = ["mypy"]
+doc = [
+    "sphinx>=7",
+    "sphinx-rtd-theme>=3",
+    "myst-parser>=2",
+    "sphinx-argparse>=0.4",
+]
+changelog = ["towncrier"]
+scm = [
+    "setuptools",
+    "setuptools-scm"
+]
+dist = [
+    "build",
+    "twine"
+]
+release = [
+    {include-group = "changelog"},
+    {include-group = "scm"},
+    {include-group = "dist"},
+]
+dev = [
+    {include-group = "test"},
+    {include-group = "format"},
+    {include-group = "cs"},
+    {include-group = "ann"},
+    {include-group = "doc"},
+    {include-group = "release"},
+    "pre-commit",
+    "tox>=4.22",
+]
+
 [tool.setuptools]
 include-package-data = true
-
-[tool.setuptools.dynamic]
-version = {attr = "py_bootstrap.VERSION"}
-dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages.find]
 include = ["py_bootstrap*"]
@@ -52,8 +98,7 @@ include = ["py_bootstrap*"]
     "*.txt",
 ]
 
-[project.scripts]
-bootstrap = "py_bootstrap.scripts.bootstrap:main"
+[tool.setuptools_scm]
 
 [tool.black]
 target-version = ['py313']
@@ -102,3 +147,44 @@ exclude_lines = [
 ]
 fail_under = 95
 omit = ["tests/*"]
+
+[tool.towncrier]
+package_dir = "py_bootstrap"
+directory = "changelog.d"
+filename = "CHANGELOG.md"
+start_string = "<!-- towncrier release notes start -->\n"
+title_format = "## [{version}] - {project_date}"
+issue_format = "[#{issue}](https://github.com/ABKorotky/py-bootstrap/issues/{issue})"
+underlines = ["", "", ""]
+wrap = false
+ignore = ["README.md"]
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecated"
+name = "Deprecated"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "security"
+name = "Security"
+showcontent = true

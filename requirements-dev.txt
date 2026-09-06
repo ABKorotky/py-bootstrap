@@ -1,9 +1,0 @@
-black
-coverage
-flake8
-flake8-pyproject
-isort
-mypy
-pre_commit
-sphinx
-tox
