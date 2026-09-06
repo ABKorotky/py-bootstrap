@@ -1,7 +1,7 @@
 # Bootstrapping of Python projects
 Provides functionality for generating skeletons for Python projects.
 
-[![Documentation Status](https://app.readthedocs.org/projects/ak-py-bootstrap/badge/?version=latest)](https://ak-py-bootstrap.readthedocs.io/en/latest/)
+[![Documentation Status](https://app.readthedocs.org/projects/ak-py-bootstrap/badge/?version=stable)](https://ak-py-bootstrap.readthedocs.io/en/stable/)
 
 Documentation: https://ak-py-bootstrap.readthedocs.io/
 

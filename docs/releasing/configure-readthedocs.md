@@ -142,6 +142,17 @@ On **Admin → Settings**:
 * **Repository URL** - should already be filled in.
 * **Default version**: `stable`. See the next section for why this matters.
 
+```{warning}
+Do this **after** the initial import, not before. Tags up to `v0.9.0` predate
+`.readthedocs.yaml`, and Read the Docs requires a config file - activating them
+produces a failing build each. A new project imports every tag at once, so a
+rule added first would fire on all of them.
+
+Activate `v0.9.1` and later by hand under **Admin → Versions**. Automation rules
+run when Read the Docs first sees a version, so adding the rule afterwards
+affects only future tags, which all carry the config file.
+```
+
 On **Admin → Automation rules**, add one rule:
 
 | Field | Value |
@@ -169,7 +180,16 @@ Read the Docs builds a separate copy of the site per active version:
 
 Set **Default version** to `stable` so <https://ak-py-bootstrap.readthedocs.io/>
 redirects to the released documentation rather than to unreleased `main`.
-Leave **Default branch** as `main`.
+Leave **Default branch** as `main`. This is what makes a reader who installed
+`ak-py-bootstrap` from PyPI land on documentation built from the matching tag.
+
+`stable` only appears once at least one tag version is active, so activate a tag
+before changing this setting.
+
+Consider setting `latest` to **Hidden** under **Admin → Versions**. It still
+builds and stays reachable by direct URL - useful for you and required for pull
+request previews - but drops out of the version flyout and out of search
+indexing, so consumers are not offered documentation for unreleased code.
 
 Under **Admin → Versions**, deactivate old point releases when the list grows;
 each active version is rebuilt and stored.

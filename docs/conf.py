@@ -56,6 +56,9 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 html_theme = "sphinx_rtd_theme"
 html_static_path: list[str] = ["static"]
+# Trims the "On Read the Docs" section out of the Addons flyout menu;
+# see the file for why this cannot be done with CSS or a project setting.
+html_js_files: list[str] = ["rtd-flyout.js"]
 html_title = f"{project} {release}"
 html_theme_options = {
     "navigation_depth": 3,
