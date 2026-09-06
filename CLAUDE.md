@@ -31,7 +31,7 @@ make format        # isort + black (write)
 make cs            # isort/black --check + flake8
 make ann           # mypy
 make test          # tox: full suite under coverage on py313 and py314
-make check         # cs + ann + test + cl-check
+make check         # everything the `ci` workflow runs, same targets
 make doc           # sphinx-apidoc into docs/modules/ then sphinx-build into docs/build/
 ```
 
@@ -46,7 +46,7 @@ make test PY_ENV=py313
 ```
 
 `tox` exists *only* to run the suite across interpreters (`py313`, `py314`); every other
-task lives in the `Makefile`. Coverage has `fail_under = 95`.
+task lives in the `Makefile`. ... and leCoverage has `fail_under = 95`.
 
 Line length differs by tool on purpose: black formats at 80, flake8 allows 88.
 

@@ -22,7 +22,7 @@ PYPI ?= pypi
 DIST ?= dist/*
 
 PKG := py_bootstrap
-SRC := $(PKG) tests
+SRC := $(PKG) tests tools
 DOC_OUT := docs/build
 
 # $(call group,NAME) -> the stamp file standing for "group NAME is installed"
@@ -69,13 +69,18 @@ ann: $(call group,ann)  ## Check type annotations with mypy
 	$(BIN)/mypy $(SRC)
 
 # tox owns the test suite: it builds the package and runs it on every supported
-# interpreter, which a single shared virtualenv cannot do.
+# interpreter, which a single shared virtualenv cannot do. Which interpreters
+# those are is declared in tox.ini, pyproject.toml and ci.yml with nothing
+# linking them, so confirm they still agree before trusting what the run covered.
 .PHONY: test
-test: $(call group,tox)  ## Run the test suite on every supported interpreter
+test: $(call group,tox)  ## Check the supported-Python list, then run the suite on every supported interpreter
+	$(PY) tools/check_matrix.py
 	$(PY) -m tox $(if $(PY_ENV),-e $(PY_ENV),)
 
+# The `ci` workflow runs exactly these targets, one per job. Keep the two in
+# step: a check worth enforcing on GitHub is worth failing locally first.
 .PHONY: check
-check: cs ann test cl-check  ## Run every static check, the test suite and the changelog fragment
+check: cs ann doc test cl-check  ## Run every check the `ci` workflow runs
 
 
 ##@ Documentation

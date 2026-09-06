@@ -1,0 +1,75 @@
+name: ci
+
+# Runs on PRs into main / release/*, on pushes to those branches, and for the
+# merge queue (so it gates queued PRs).
+#
+# This workflow is `make check`, split across jobs so the legs run in parallel.
+# Every check is a `make` target invoked exactly as it is locally - there is no
+# check that CI enforces and `make check` does not, and none the other way
+# round. `tox` owns only the interpreter matrix, so the test job pins one
+# interpreter per leg and hands `make` the matching env rather than letting tox
+# discover interpreters itself.
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "release/*"
+  push:
+    branches:
+      - main
+      - "release/*"
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  # Cancel superseded PR runs; never cancel a merge-queue or push run.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Style, annotations, the docs build and the changelog fragment. All
+  # single-interpreter, so they share one matrix over `make` targets.
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [cs, ann, doc, cl-check]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # setuptools-scm (doc) and cl-check need history + tags
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      # The Makefile defaults PYTHON to python3.13; setup-python already put the
+      # interpreter we want first on PATH, so point it there instead.
+      - run: make ${{ matrix.target }} PYTHON=python
+
+  # The suite, once per supported interpreter. Each leg installs only its own
+  # interpreter, so tox never has to find a second one.
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python: "3.13"
+            toxenv: py313
+          - python: "3.14"
+            toxenv: py314
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # setuptools-scm needs full history + tags
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: make test PY_ENV=${{ matrix.toxenv }} PYTHON=python

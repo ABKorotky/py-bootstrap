@@ -28,8 +28,9 @@ Preview any time:
 make cl-preview VERSION=0.10.0
 ```
 
-CI (`.github/workflows/changelog.yml`) runs `towncrier check` on every PR and
-fails if no fragment was added. Trivial PRs can carry the `skip-changelog` label.
+`make cl-check` fails if no fragment was added. It is part of `make check`, and
+the `ci` workflow runs the same target — the rule is identical locally and on
+GitHub.
 
 ## At release time
 

@@ -29,8 +29,8 @@ stamp file — so re-running a target that is already provisioned costs nothing.
 | `format` | reformat with `black` + `isort` | `format` |
 | `cs` | code style — `black`, `isort`, `flake8` | `cs` |
 | `ann` | type checks — `mypy` | `ann` |
-| `test` | run the suite on every supported interpreter, via `tox` | `tox` |
-| `check` | `cs` + `ann` + `test` | — |
+| `test` | check the supported-Python list agrees between `tox.ini`, `pyproject.toml` and `ci.yml`, then run the suite on every supported interpreter, via `tox` | `tox` |
+| `check` | every check the `ci` workflow runs: `cs` + `ann` + `doc` + `test` + `cl-check` | — |
 | `doc` | build this documentation (same steps Read the Docs runs) | `doc` |
 | `cl-preview VERSION=X.Y.Z` | preview the collated changelog section | `changelog` |
 | `cl-check` | fail if the branch adds no news fragment (CI runs this on PRs) | `changelog` |
@@ -66,8 +66,8 @@ tasks rather than building one per task.
    `make cl-check` mirrors what CI enforces.
 4. Open a PR against `main` (or the release branch) and enable auto-merge.
 
-You don't squash or rebase by hand. CI (`cs`, `ann`, `utc`, `doc`) and the
-`changelog` check run on the PR; the **merge queue** then rebases the PR onto the
+You don't squash or rebase by hand. The `ci` workflow runs the same targets as
+`make check`, one per job; the **merge queue** then rebases the PR onto the
 current target, re-runs the checks, and **squash-merges** it. History stays
 linear — one commit per PR, no merge commits.
 

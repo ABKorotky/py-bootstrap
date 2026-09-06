@@ -1,0 +1,1 @@
+Extended the code style and annotation checks to `tools/`. `make format`, `make cs` and `make ann` previously covered only `py_bootstrap/` and `tests/`, leaving the release and check scripts unchecked.

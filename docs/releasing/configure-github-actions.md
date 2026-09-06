@@ -180,12 +180,15 @@ What each tag triggers in CI:
 
 ### CI reuses these targets
 
+`ci.yml` is migrated: it is `make check`, split across jobs so the legs run in
+parallel. The separate `changelog.yml` was folded in as another `make cl-check`
+leg.
+
 ```{warning}
-The workflows have not been migrated yet. `release.yml` still calls
-`tox -e release-check`, `tox -e build` and `tox -e smoke --installpkg dist/*.whl`,
-and `changelog.yml` still calls `tox -e cl-check` - envs that no longer exist now
-that `tox.ini` is reduced to the interpreter matrix. **CI fails until they are
-converted to the `make` targets above.**
+`release.yml` has not been migrated. It still calls `tox -e release-check`,
+`tox -e build` and `tox -e smoke --installpkg dist/*.whl` - envs that no longer
+exist now that `tox.ini` is reduced to the interpreter matrix. **Releases fail
+until it is converted to the `make` targets above.**
 ```
 
 Once converted, the workflows will only add GitHub-specific plumbing on top of
