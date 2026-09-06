@@ -12,11 +12,18 @@ build:
       - git fetch --unshallow || true
       - git fetch --tags || true
     pre_build:
-      # Doc tooling lives in the `docs` dependency group (PEP 735).
+      # `make apidoc` installs the `doc` dependency group (PEP 735) and
+      # regenerates docs/modules/, which is gitignored. Pointing VENV at the
+      # environment Read the Docs already built stops make from creating a
+      # second one, and keeps the sphinx-apidoc flags defined in one place.
+      # pip must be >= 25.1 first: PEP 735 `--group` is what the target uses.
+      #
+      # Equivalent without make:
+      #   python -m pip install --group doc
+      #   sphinx-apidoc --separate --force --no-toc --module-first \
+      #       --ext-viewcode --output-dir docs/modules py_bootstrap
       - python -m pip install --upgrade pip
-      - python -m pip install --group docs
-      # Regenerate the API reference stubs (docs/modules/ is gitignored).
-      - sphinx-apidoc --separate --force --no-toc --module-first --ext-viewcode --output-dir docs/modules py_bootstrap
+      - make apidoc VENV=$READTHEDOCS_VIRTUALENV_PATH
 
 sphinx:
   configuration: docs/conf.py

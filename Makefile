@@ -79,11 +79,17 @@ check: cs ann test cl-check  ## Run every static check, the test suite and the c
 
 ##@ Documentation
 
-.PHONY: doc
-doc: $(call group,doc) $(STAMPS)/editable  ## Build the HTML documentation
-	rm -rf docs/modules $(DOC_OUT)
+# docs/modules/ is gitignored and regenerated. Read the Docs runs this target
+# too, with VENV pointed at its own environment, so the flags live in one place.
+.PHONY: apidoc
+apidoc: $(call group,doc)  ## Regenerate the API reference stubs in docs/modules/
+	rm -rf docs/modules
 	$(BIN)/sphinx-apidoc --separate --force --no-toc --module-first --ext-viewcode \
 		--output-dir=docs/modules $(PKG)
+
+.PHONY: doc
+doc: apidoc $(STAMPS)/editable  ## Build the HTML documentation
+	rm -rf $(DOC_OUT)
 	$(BIN)/sphinx-build -b html --keep-going docs $(DOC_OUT)
 
 

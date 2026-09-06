@@ -1,0 +1,1 @@
+Added `docs/releasing/configure-readthedocs.md`, a setup guide for hosting the documentation on Read the Docs: creating the project, verifying the first build, the version and automation-rule settings, pull request previews, and troubleshooting.

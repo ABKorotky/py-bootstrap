@@ -80,4 +80,5 @@ merges only), and monotonically increasing tags on `main`.
 
 Version, changelog and publishing are automated — see the release docs in the
 repository (`docs/releasing/`) for the full flow, PyPI Trusted Publishing setup,
-and the GitHub Actions configuration.
+the GitHub Actions configuration and the Read the Docs setup
+(`configure-readthedocs.md`).
