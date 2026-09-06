@@ -17,7 +17,8 @@ PY     := $(BIN)/python
 STAMPS := $(VENV)/.stamps
 
 # Release: index alias from ~/.pypirc, and what dist-upload sends.
-PYPI ?= testpypi
+# Defaults to the real index - `PYPI=testpypi` for a rehearsal.
+PYPI ?= pypi
 DIST ?= dist/*
 
 PKG := py_bootstrap
@@ -136,7 +137,7 @@ dist-upload: $(call group,dist)  ## Upload DIST (default dist/*) to PYPI (defaul
 
 # Prerequisites run left to right and stop at the first failure. Do not add -j.
 .PHONY: release
-release: cut-tag dist-build dist-upload  ## Cut the tag, build, upload (VERSION=X.Y.Z [PYPI=pypi])
+release: cut-tag dist-build dist-upload  ## Cut the tag, build, upload (VERSION=X.Y.Z [PYPI=testpypi])
 
 
 ##@ Housekeeping

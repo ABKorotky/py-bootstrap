@@ -41,7 +41,7 @@ stamp file — so re-running a target that is already provisioned costs nothing.
 | `release VERSION=X.Y.Z` | `cut-tag` + `dist-build` + `dist-upload` | — |
 | `clean` / `venvclean` | remove build artefacts / also remove the virtualenvs (`.venv`, `.tox/`) | — |
 
-Useful variables: `VERSION`, `PYPI` (index alias, default `testpypi`), `DIST`
+Useful variables: `VERSION`, `PYPI` (index alias, default `pypi`), `DIST`
 (what `dist-upload` sends, default `dist/*`), `PY_ENV` (a single tox env for
 `make test`), `AGAINST` (for `cl-check`), `PYTHON`, `VENV`.
 

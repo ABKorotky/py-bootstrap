@@ -148,7 +148,7 @@ make release VERSION=0.10.0          # cut-tag + dist-build + dist-upload
 git push origin main --follow-tags
 ```
 
-`make release` uploads to Test PyPI by default; pass `PYPI=pypi` for production.
+`make release` uploads to the real PyPI by default; pass `PYPI=testpypi` to rehearse.
 
 Individual targets, if you'd rather run them by hand:
 

@@ -313,8 +313,8 @@ provisioned lazily rather than duplicated per task:
 - `cl-build VERSION=X.Y.Z`. Changelog. Collates `changelog.d/` fragments into `CHANGELOG.md` and removes them.
 - `cut-tag VERSION=X.Y.Z`. Verifies the version is releasable and unused and the working tree is clean, writes the `## [X.Y.Z]` section, commits it as `Prepare X.Y.Z version` and tags `vX.Y.Z`.
 - `dist-build`. Builds the sdist and wheel into `dist/` from a clean working tree, then installs the wheel into a throwaway virtualenv and checks `bootstrap list` works.
-- `dist-upload`. Uploads `DIST` (default `dist/*`) to `PYPI` (default `testpypi`) after `twine check --strict`.
-- `release VERSION=X.Y.Z [PYPI=pypi]`. The whole flow: `cut-tag`, `dist-build`, `dist-upload`, stopping at the first failure.
+- `dist-upload`. Uploads `DIST` (default `dist/*`) to `PYPI` (default `pypi`) after `twine check --strict`.
+- `release VERSION=X.Y.Z [PYPI=testpypi]`. The whole flow: `cut-tag`, `dist-build`, `dist-upload`, stopping at the first failure.
 - `clean` / `venvclean`. Removes build, test and doc artefacts / also removes the virtualenvs (`.venv` and `.tox/`).
 
 Run `make` with no target for the full list.
@@ -381,7 +381,7 @@ version constant to bump, no tokens, no manual `twine`. Setup and details:
    make cl-preview VERSION=0.10.0   # read the section the fragments will produce
    make cut-tag VERSION=0.10.0      # verify, write CHANGELOG.md, commit, tag v0.10.0
    make dist-build                  # build and check the wheel installs
-   make dist-upload                 # -> Test PyPI; PYPI=pypi for production
+   make dist-upload                 # -> PyPI; PYPI=testpypi to rehearse
    git push origin <branch> --follow-tags
    ```
    `make release VERSION=0.10.0` runs those three steps in one go.

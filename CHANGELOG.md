@@ -35,7 +35,6 @@
 ### Removed
 - Removed `requirements.txt` and `requirements-dev.txt`. Dependencies are declared in `pyproject.toml` as PEP 735 dependency groups; install them with `pip install -e . --group dev` or `make deps`.
 
-
 ## [0.9.0] - 2025-11-02
 ### Changed
 - Move `name` and `description` CLI arguments processing from `BaseBuildBootstrapOperation` to `DefaultBuildBootstrapOperation`. See `py_bootstrap/operations/build_bootstrap.py` file for details.
@@ -44,6 +43,7 @@
 ### Added
 - Add `tox.ini` to `application` bootstrap. See `py_bootstrap/templates/application/tox.ini` file for details.
 - Add `tox.ini` to `package` bootstrap. See `py_bootstrap/templates/package/tox.ini` file for details.
+
 ### Changed
 - `underscored_name` placeholder is replaced to `python_name` in all templates and corresponding builders. see `py_bootstrap/templates/` directory for details.
 
@@ -88,9 +88,6 @@
 - Implement `ListBootstrapsOperation` class for printing enabled bootstraps. See `/py_bootstrap/operations/list_bootstraps.py` file for details.
 - Implement the main script for running bootstrap operations. See `/py_bootstrap/scripts/bootstrap.py` file for details.
 - Implement base functionality for operations. See `/py_bootstrap/base/operations.py` file for details.
-
-### Added
-- Prepare the project structure. See `/` directory for details.
 - Implement the main CLI entrypoint. See `/py_bootstrap/cli_entrypoint.py` file for details.
 
 ## [0.1.0] - 2024-06-08
