@@ -23,7 +23,7 @@ pip install --upgrade pip
 
 Install the package:
 ```bash
-pip install -i https://test.pypi.org/simple/ ak-py-bootstrap
+pip install ak-py-bootstrap
 ```
 During installing the package creates an entry-point `bootstrap`.
 
